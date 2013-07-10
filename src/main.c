@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
 
 	//Connect to wiimote
 	printf("Put Wiimote in discoverable mode now (press 1+2)...\n");
-	playsound("../sounds/pair_remote.wav");
+	playsound("sounds/pair_remote.wav");
 	while (!(wiimote = cwiid_open(&bdaddr, 0))) fprintf(stderr, "Unable to connect to wiimote\n");
 	printf("Wiimote Connected.\n\n");
 
@@ -86,7 +86,7 @@ int main(int argc, char * argv[])
 		if (mode == MANUAL_MODE)
 		{
 			printf("Initialising Manual Control Mode\n");
-			playsound("../sounds/manual_start.wav");
+			playsound("sounds/manual_start.wav");
 			led_state = 0;
 			toggle_bit(led_state, CWIID_LED2_ON);
 			set_led_state(wiimote, led_state);
@@ -96,7 +96,7 @@ int main(int argc, char * argv[])
 			{
 				if (two_button_pressed)  //Do this section once 2 button is pressed.
 				{
-					playsound("../sounds/bodyjar.wav");
+					playsound("sounds/bodyjar.wav");
 					manual_mode(wiimote);
 				}
 			}

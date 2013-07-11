@@ -23,3 +23,4 @@ micro_maestro:
 	
 clean:
 	rm obj/*.o
+

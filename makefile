@@ -7,10 +7,10 @@ LDIR =lib
 
 LIBS=-lm -lbluetooth -lcwiid -lpthread
 
-_DEPS = ball_plate.h manual_mode.h micro_maestro.h playsound.h
+_DEPS = ball_plate.h manual_mode.h micro_maestro.h playsound.h wiimote_stuff.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o manual_mode.o micro_maestro.o playsound.o
+_OBJ = main.o manual_mode.o micro_maestro.o playsound.o wiimote_stuff.c
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

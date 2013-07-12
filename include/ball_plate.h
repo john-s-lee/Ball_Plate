@@ -14,4 +14,4 @@
 
 extern int next_mode;
 extern unsigned char rpt_mode;
-
+extern cwiid_wiimote_t *wiimote;	/* wiimote handle */

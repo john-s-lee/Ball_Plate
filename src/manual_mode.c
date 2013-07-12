@@ -1,7 +1,7 @@
 #include "../include/ball_plate.h"
 #include "../include/micro_maestro.h"
 
-void manual_mode(cwiid_wiimote_t *wiimote)
+void manual_mode()
 {
 	struct cwiid_state state;	/* wiimote state */
 	int fd = init_maestro();

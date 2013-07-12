@@ -14,3 +14,4 @@
 
 extern int next_mode;
 extern unsigned char rpt_mode;
+

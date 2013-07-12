@@ -8,9 +8,6 @@
 #include "../include/wiimote_stuff.h"
 
 
-//************   Function Prototypes ************/
-//void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count, union cwiid_mesg mesg[], struct timespec *timestamp);
-
 //**************  Global Variables **************/
 cwiid_mesg_callback_t cwiid_callback;
 cwiid_err_t err;
@@ -30,7 +27,8 @@ int main(int argc, char * argv[])
 	pthread_t t1;
 
 	cwiid_set_err(err);
-	str2ba("00:1B:EA:00:E3:2F", &bdaddr);  //MAC address of wiimote if known
+	bdaddr = *BDADDR_ANY;  //MAC Address of wiimote if unknown
+	//str2ba("00:1B:EA:00:E3:2F", &bdaddr);  //MAC address of wiimote if known
 
 	//Connect to wiimote
 	printf("Put Wiimote in discoverable mode now (press 1+2)...\n");

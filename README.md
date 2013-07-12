@@ -1,9 +1,14 @@
-Project:   Ball and Plate Balancing System
-Author:    John Lee
-Student #: s3273319
+<center><H2> Ball and Plate Project </H1></center>
 
-Description:
+<H3>Author:  John Lee
+Student Number: 3273319</H3>
 
-This is the code to control the Ball and Plate Balancing system.
-This is being developed as part of my final year project for
-Design 4B at RMIT university.
+<H3><u>Description:</H3></u>
+This is the git repository for the ball and plate balancing system project.  This is my final year project completed as part of the course Engineering Design 4 at RMIT.  
+
+<u><H3>Usage:</H3></u>
+
+1.  Compile Code by typing "make" in the root directory
+2.  Run code by typing "./ball_plate" in the root directory
+
+

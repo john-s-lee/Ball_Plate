@@ -5,7 +5,7 @@
 #include "../include/playsound.h"
 #include "../include/manual_mode.h"
 #include "../include/ball_plate.h"
-#include "../include/wiimote_stuff.h
+#include "../include/wiimote_stuff.h"
 
 #define DOWN_BUTTON 0x0100
 #define UP_BUTTON 0x0200

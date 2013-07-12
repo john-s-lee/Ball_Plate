@@ -7,14 +7,6 @@
 #include "../include/ball_plate.h"
 #include "../include/wiimote_stuff.h"
 
-#define DOWN_BUTTON 0x0100
-#define UP_BUTTON 0x0200
-#define TWO_BUTTON 0x0001
-#define STABLE_MODE 0
-#define MANUAL_MODE 1
-#define CIRCLE_MODE 2
-#define SQUARE_MODE 3
-
 
 //************   Function Prototypes ************/
 //void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count, union cwiid_mesg mesg[], struct timespec *timestamp);
@@ -23,7 +15,7 @@
 cwiid_mesg_callback_t cwiid_callback;
 cwiid_err_t err;
 int next_mode, mode;
-int two_button_pressed;
+int two_button_pressed = 0;
 unsigned char rpt_mode = 0;
 
 //**************   Main Function   **************/

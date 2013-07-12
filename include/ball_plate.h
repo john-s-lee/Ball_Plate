@@ -6,12 +6,20 @@
 #include <bluetooth/bluetooth.h>   //Used by cwiid library
 #include <cwiid.h>   //Cwiid Library
 
+#define DOWN_BUTTON 0x0100
+#define UP_BUTTON 0x0200
+#define TWO_BUTTON 0x0001
+#define STABLE_MODE 0
+#define MANUAL_MODE 1
+#define CIRCLE_MODE 2
+#define SQUARE_MODE 3
 #define PI 3.14159
 #define toggle_bit(bf,b)	\
 	(bf) = ((bf) & b)		\
 	       ? ((bf) & ~(b))	\
 	       : ((bf) | (b))
 
-extern int next_mode;
+extern int next_mode, mode;
+extern int two_button_pressed;
 extern unsigned char rpt_mode;
 

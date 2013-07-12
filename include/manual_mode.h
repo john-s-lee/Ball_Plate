@@ -1,1 +1,1 @@
-void manual_mode();
+void manual_mode(cwiid_wiimote_t *wiimote);

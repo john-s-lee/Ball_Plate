@@ -27,12 +27,13 @@ cwiid_err_t err;
 int next_mode, mode;
 int two_button_pressed;
 unsigned char rpt_mode = 0;
-cwiid_wiimote_t *wiimote;	/* wiimote handle */
+
 //**************   Main Function   **************/
 int main(int argc, char * argv[])
 {
 	mode = STABLE_MODE;
 	next_mode = 0;
+	cwiid_wiimote_t *wiimote;	/* wiimote handle */
 	struct cwiid_state state;	/* wiimote state */
 	bdaddr_t bdaddr;	/* bluetooth device address */
 	unsigned char led_state = 0;
@@ -184,22 +185,6 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 	}
 }
 
-
-//*******************  Set Wiimote LED State Function **************/
-void set_led_state(cwiid_wiimote_t *wiimote, unsigned char led_state)
-{
-	if (cwiid_set_led(wiimote, led_state)) {
-		fprintf(stderr, "Error setting LEDs \n");
-	}
-}
-	
-//*******************   Set Wiimote Report Mode Function ***********/
-void set_rpt_mode(cwiid_wiimote_t *wiimote, unsigned char rpt_mode)
-{
-	if (cwiid_set_rpt_mode(wiimote, rpt_mode)) {
-		fprintf(stderr, "Error setting report mode\n");
-	}
-}
 
 //*************** Wiimote Error Handling Function *****************/
 void err(cwiid_wiimote_t *wiimote, const char *s, va_list ap)

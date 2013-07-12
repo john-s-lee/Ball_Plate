@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
 				if (two_button_pressed)  //Do this section once 2 button is pressed.
 				{
 					playsound("sounds/bodyjar.wav");
-					manual_mode();
+					manual_mode(wiimote);
 				}
 			}
 

@@ -27,12 +27,12 @@ cwiid_err_t err;
 int next_mode, mode;
 int two_button_pressed;
 unsigned char rpt_mode = 0;
+cwiid_wiimote_t *wiimote;	/* wiimote handle */
 //**************   Main Function   **************/
 int main(int argc, char * argv[])
 {
 	mode = STABLE_MODE;
 	next_mode = 0;
-	cwiid_wiimote_t *wiimote;	/* wiimote handle */
 	struct cwiid_state state;	/* wiimote state */
 	bdaddr_t bdaddr;	/* bluetooth device address */
 	unsigned char led_state = 0;

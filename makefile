@@ -24,3 +24,12 @@ ball_plate: $(OBJ)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	
+startup:
+	chmod +x scripts/ball_plate
+	cp scripts/ball_plate /etc/init.d
+	update-rc.d ball_plate defaults
+	
+not_startup:
+	update-rc.d -f ball_plate remove
+	rm /etc/init.d/ball_plate

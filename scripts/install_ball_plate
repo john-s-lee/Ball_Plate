@@ -49,7 +49,6 @@ cd "$CWD"
 cd ..
 
 make
-mv ball_plate /usr/bin
 
 
 

@@ -64,11 +64,20 @@ int main(int argc, char * argv[])
 			led_state = 0;
 			toggle_bit(led_state, CWIID_LED1_ON);
 			set_led_state(wiimote, led_state);
+			printf("Executing Ball Stabilization Mode\n");
 			while (!next_mode)
 			{
-				printf("Executing Ball Stabilization Mode\n");
-				printf("Current x-co-ordinates are %f\n", x_cord);
-				sleep(1);
+				if (touchscreen_touched)
+				{
+					printf("\rCurrent X_Cord:  %f, Current Y_Cord:  %f ", x_cord, y_cord);
+					fflush(stdout);
+				}
+				else 
+				{
+					printf("\rTouchscreen not touched                                         ");
+					fflush(stdout);
+				}	
+				usleep(100000);
 			}
 
 			printf("Leaving Ball Stabilization Mode\n\n");

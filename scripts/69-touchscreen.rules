@@ -1,0 +1,2 @@
+KERNEL=="event*", SUBSYSTEMS=="input", ATTRS{name}=="eGalax Inc. USB TouchController", MODE="0666"
+

@@ -18,7 +18,7 @@ $(ODIR)/%.o: src/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 ball_plate: $(OBJ)
-	gcc -o $@ $^ $(CFLAGS) $(LIBS)
+	gcc -o /usr/bin/ball_plate $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 

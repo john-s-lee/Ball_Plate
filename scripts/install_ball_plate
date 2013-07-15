@@ -47,6 +47,6 @@ cd "$CWD"
 cd ..
 
 make
-cp ball_plate /usr/bin
+mv ball_plate /usr/bin
 
 make startup

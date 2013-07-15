@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$(id -u)" != "0" ]; then
+	echo "Must be run as root.  Correct Usage sudo uninstall_ball_plate"
+	exit 1
+fi
+
+if [ -d "/usr/share/sounds/ball_plate" ]; then
+  echo "Removing *.wav files"
+  rm /usr/share/sounds/ball_plate/*
+  rmdir /usr/share/sounds/ball_plate
+fi
+
+if [ -f "/usr/bin/ball_plate" ]; then
+  echo "Removing binary file"
+  rm /usr/bin/ball_plate
+fi
+
+cd ..
+make not_startup

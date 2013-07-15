@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [ "$(id -u)" != "0" ]; then
+	echo "Must be run as root.  Correct Usage sudo install_ball_plate"
+	exit 1
+fi
+
+CWD=$(pwd)
+
+if [ ! -d "/usr/share/sounds/ball_plate" ]; then
+  echo "Creating /usr/share/sounds/ball_plate to save program *.wav files"
+  mkdir /usr/share/sounds/ball_plate
+fi
+
+cd /usr/share/sounds/ball_plate
+
+if [ ! -f "bodyjar.wav" ]; then
+	echo "Downloading bodyjar.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ip22MLCbwE/bodyjar.wav
+fi
+
+if [ ! -f "manual_start.wav" ]; then
+	echo "Downloading manual_start.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ojPRoOcx-Z/manual_start.wav
+fi
+
+if [ ! -f "pair_remote.wav" ]; then
+	echo "Downloading Pair_Remote.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/uC36VzpmSy/pair_remote.wav
+fi
+
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' libcwiid1|grep "install ok installed")
+echo Checking for libcwiid1: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing libcwiid1 package"
+	sudo apt-get --force-yes --yes install libcwiid1
+fi
+
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' libcwiid-dev|grep "install ok installed")
+echo Checking for libcwiid-dev: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing libcwiid-dev package"
+	sudo apt-get --force-yes --yes install libcwiid-dev
+fi
+
+cd "$CWD"
+cd ..
+
+make
+cp ball_plate /usr/bin
+
+make startup

@@ -23,7 +23,7 @@ void * touchscreen_process()
 {
 	struct input_event ev;
 	int fd;
-	fd=open("/dev/input/event5",O_RDONLY);
+	fd=open("/dev/input/eGalax",O_RDONLY);
 
 	while(1)
 	{

@@ -1,2 +1,2 @@
-KERNEL=="event*", SUBSYSTEMS=="input", ATTRS{name}=="eGalax Inc. USB TouchController", MODE="0666", SYMLINK+="input/eGalax"
+KERNEL=="event*", SUBSYSTEMS=="input", ATTRS{name}=="eGalax Inc. USB TouchController", ATTRS{properties}=="2", MODE="0666", SYMLINK+="input/eGalax"
 

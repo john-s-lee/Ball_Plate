@@ -6,6 +6,7 @@
 #include "../include/manual_mode.h"
 #include "../include/ball_plate.h"
 #include "../include/wiimote_stuff.h"
+#include "../include/touchscreen.h"
 
 
 //**************  Global Variables **************/
@@ -24,7 +25,8 @@ int main(int argc, char * argv[])
 	struct cwiid_state state;	/* wiimote state */
 	bdaddr_t bdaddr;	/* bluetooth device address */
 	unsigned char led_state = 0;
-	pthread_t t1;
+
+	init_touchscreen();  //initialise touchscreen information (see touchscreen.c)
 
 	cwiid_set_err(err);
 	bdaddr = *BDADDR_ANY;  //MAC Address of wiimote if unknown
@@ -65,6 +67,7 @@ int main(int argc, char * argv[])
 			while (!next_mode)
 			{
 				printf("Executing Ball Stabilization Mode\n");
+				printf("Current x-co-ordinates are %f\n", x_cord);
 				sleep(1);
 			}
 

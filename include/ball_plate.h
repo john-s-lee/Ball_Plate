@@ -19,7 +19,7 @@
 	       ? ((bf) & ~(b))	\
 	       : ((bf) | (b))
 
-extern int next_mode, mode;
-extern int two_button_pressed;
+extern int next_mode, mode, two_button_pressed, touchscreen_touched;
 extern unsigned char rpt_mode;
+extern double x_cord, y_cord;
 

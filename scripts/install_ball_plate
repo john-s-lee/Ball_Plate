@@ -43,10 +43,13 @@ if [ "" == "$PKG_OK" ]; then
 	sudo apt-get --force-yes --yes install libcwiid-dev
 fi
 
+sudo cp 69-touchscreen.rules /etc/udev/rules.d
+
 cd "$CWD"
 cd ..
 
 make
 mv ball_plate /usr/bin
 
-make startup
+
+

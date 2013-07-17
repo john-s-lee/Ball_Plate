@@ -45,7 +45,7 @@ int main(int argc, char * argv[])
 		return 0;
 	}
 
-	toggle_bit(rpt_mode, CWIID_RPT_BTN);
+	rpt_mode = toggle_bit(rpt_mode, CWIID_RPT_BTN);
 	set_rpt_mode(wiimote, rpt_mode);  //enable button pressed messages for callback
 
 	if (cwiid_enable(wiimote, CWIID_FLAG_MESG_IFC)) 
@@ -62,7 +62,7 @@ int main(int argc, char * argv[])
 		{
 			printf("Initialising Ball Stabilization Mode\n");
 			led_state = 0;
-			toggle_bit(led_state, CWIID_LED1_ON);
+			led_state = toggle_bit(led_state, CWIID_LED1_ON);
 			set_led_state(wiimote, led_state);
 			printf("Executing Ball Stabilization Mode\n");
 			while (!next_mode)
@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
 			printf("Initialising Manual Control Mode\n");
 			playsound("/usr/share/sounds/ball_plate/manual_start.wav");
 			led_state = 0;
-			toggle_bit(led_state, CWIID_LED2_ON);
+			led_state=toggle_bit(led_state, CWIID_LED2_ON);
 			set_led_state(wiimote, led_state);
 			two_button_pressed = 0;
 			printf("Waiting for 2 Button on Wiimote to be pressed......\n");
@@ -111,7 +111,7 @@ int main(int argc, char * argv[])
 		{
 			printf("Initialising Circle Mode\n");
 			led_state = 0;
-			toggle_bit(led_state, CWIID_LED3_ON);
+			led_state=toggle_bit(led_state, CWIID_LED3_ON);
 			set_led_state(wiimote, led_state);
 			while (!next_mode)
 			{
@@ -127,7 +127,7 @@ int main(int argc, char * argv[])
 		{
 			printf("Initialising Sqaure Mode\n");
 			led_state =0;
-			toggle_bit(led_state, CWIID_LED4_ON);
+			led_state=toggle_bit(led_state, CWIID_LED4_ON);
 			set_led_state(wiimote, led_state);
 			while (!next_mode)
 			{
@@ -146,3 +146,25 @@ int main(int argc, char * argv[])
 }
 
 
+int set_bit(int number, int bit)
+{
+	number |= bit;
+	return number;
+}
+
+int toggle_bit(int number, int bit)
+{
+	number ^= bit;
+	return number;
+}
+
+int check_bit(int number, int bit_to_check)
+{
+	int bit = number & bit_to_check;
+		return bit;
+}
+
+int clear_bit(int number, int bit)
+{
+	number &= ~(bit);
+}

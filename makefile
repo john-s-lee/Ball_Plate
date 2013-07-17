@@ -17,7 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: src/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-ball_plate: $(OBJ)
+all: $(OBJ)
 	gcc -o /usr/bin/ball_plate $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean

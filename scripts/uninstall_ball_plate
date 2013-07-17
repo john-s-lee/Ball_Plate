@@ -16,7 +16,7 @@ if [ -f "/usr/bin/ball_plate" ]; then
   rm /usr/bin/ball_plate
 fi
 
-sudo cp 69-touchscreen.rules /etc/udev/rules.d
+sudo rm /etc/udev/rules.d/69-touchscreen.rules
 
 cd ..
 make not_startup

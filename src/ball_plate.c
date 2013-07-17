@@ -29,8 +29,8 @@ int main(int argc, char * argv[])
 	init_touchscreen();  //initialise touchscreen information (see touchscreen.c)
 
 	cwiid_set_err(err);
-	bdaddr = *BDADDR_ANY;  //MAC Address of wiimote if unknown
-	//str2ba("00:1B:EA:00:E3:2F", &bdaddr);  //MAC address of wiimote if known
+	//bdaddr = *BDADDR_ANY;  //MAC Address of wiimote if unknown
+	str2ba("00:1B:EA:00:E3:2F", &bdaddr);  //MAC address of wiimote if known
 
 	//Connect to wiimote
 	printf("Put Wiimote in discoverable mode now (press 1+2)...\n");

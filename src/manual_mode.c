@@ -8,7 +8,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 	int target;
 
 	/*Set wiimote to report accelerometer readings*/
-	toggle_bit(rpt_mode, CWIID_RPT_ACC);
+	rpt_mode=toggle_bit(rpt_mode, CWIID_RPT_ACC);
 	if (cwiid_set_rpt_mode(wiimote, rpt_mode)) fprintf(stderr, "Error setting report mode\n");
 
 	int i = 0;
@@ -60,7 +60,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 	close_maestro(fd);
 
 	/*Cancel accelerometer readings*/
-	toggle_bit(rpt_mode, CWIID_RPT_ACC);
+	rpt_mode=toggle_bit(rpt_mode, CWIID_RPT_ACC);
 	if (cwiid_set_rpt_mode(wiimote, rpt_mode)) fprintf(stderr, "Error setting report mode\n");
 
 }

@@ -29,7 +29,7 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 					next_mode++;
 			}
 
-			if (mesg[i].btn_mesg.buttons & TWO_BUTTON)
+			if (mesg[i].btn_mesg.buttons & CWIID_BTN_2)
 			{
 					printf("2 Button Pressed!!\n");
 					two_button_pressed = 1;

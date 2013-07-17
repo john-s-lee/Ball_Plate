@@ -43,6 +43,20 @@ if [ "" == "$PKG_OK" ]; then
 	sudo apt-get --force-yes --yes install libcwiid-dev
 fi
 
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' make|grep "install ok installed")
+echo Checking for make: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing make package"
+	sudo apt-get --force-yes --yes install make
+fi
+
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' bluez-utils|grep "install ok installed")
+echo Checking for bluez-utils: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing bluezutils package"
+	sudo apt-get --force-yes --yes install bluez-utils
+fi
+
 sudo cp 69-touchscreen.rules /etc/udev/rules.d
 
 cd "$CWD"

@@ -7,27 +7,27 @@ fi
 
 CWD=$(pwd)
 
-if [ ! -d "/usr/share/sounds/ball_plate" ]; then
-  echo "Creating /usr/share/sounds/ball_plate to save program *.wav files"
-  mkdir /usr/share/sounds/ball_plate
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' gcc|grep "install ok installed")
+echo Checking for gcc: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing gcc package"
+	sudo apt-get --force-yes --yes install gcc
 fi
 
-cd /usr/share/sounds/ball_plate
-
-if [ ! -f "bodyjar.wav" ]; then
-	echo "Downloading bodyjar.wav"
-	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ip22MLCbwE/bodyjar.wav
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' alsa-utils|grep "install ok installed")
+echo Checking for alsa-utils: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing alsa-utils package"
+	sudo apt-get --force-yes --yes install alsa-utils
 fi
 
-if [ ! -f "manual_start.wav" ]; then
-	echo "Downloading manual_start.wav"
-	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ojPRoOcx-Z/manual_start.wav
+PKG_OK=$(dpkg-query -W --showformat='${Status}\n' evtest|grep "install ok installed")
+echo Checking for evtest: $PKG_OK
+if [ "" == "$PKG_OK" ]; then
+	echo "Installing evtest package"
+	sudo apt-get --force-yes --yes install evtest
 fi
 
-if [ ! -f "pair_remote.wav" ]; then
-	echo "Downloading Pair_Remote.wav"
-	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/uC36VzpmSy/pair_remote.wav
-fi
 
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' libcwiid1|grep "install ok installed")
 echo Checking for libcwiid1: $PKG_OK
@@ -57,11 +57,39 @@ if [ "" == "$PKG_OK" ]; then
 	sudo apt-get --force-yes --yes install bluez-utils
 fi
 
-sudo cp 69-touchscreen.rules /etc/udev/rules.d
+if [ ! -d "/usr/share/sounds" ]; then
+  echo "Creating /usr/share/sounds to save program *.wav files"
+  mkdir /usr/share/sounds
+fi
+
+if [ ! -d "/usr/share/sounds/ball_plate" ]; then
+  echo "Creating /usr/share/sounds/ball_plate to save program *.wav files"
+  mkdir /usr/share/sounds/ball_plate
+fi
+
+cd /usr/share/sounds/ball_plate
+
+if [ ! -f "bodyjar.wav" ]; then
+	echo "Downloading bodyjar.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ip22MLCbwE/bodyjar.wav
+fi
+
+if [ ! -f "manual_start.wav" ]; then
+	echo "Downloading manual_start.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/ojPRoOcx-Z/manual_start.wav
+fi
+
+if [ ! -f "pair_remote.wav" ]; then
+	echo "Downloading Pair_Remote.wav"
+	wget https://www.dropbox.com/sh/ig8wp31wmiojqgc/uC36VzpmSy/pair_remote.wav
+fi
+
 
 cd "$CWD"
-cd ..
+sudo cp 69-touchscreen.rules /etc/udev/rules.d
 
+
+cd ..
 make
 
 

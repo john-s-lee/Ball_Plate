@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
 					printf("\rTouchscreen not touched                                         ");
 					fflush(stdout);
 				}	
-				usleep(100000);
+				usleep(10000);
 			}
 
 			printf("Leaving Ball Stabilization Mode\n\n");
@@ -100,6 +100,7 @@ int main(int argc, char * argv[])
 					playsound("/usr/share/sounds/ball_plate/bodyjar.wav");
 					manual_mode(wiimote);
 				}
+				usleep(10000);
 			}
 
 			printf("Leaving Manual Control Mode\n\n");

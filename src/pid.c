@@ -5,8 +5,7 @@
 #include "../include/ball_plate.h"
 #include "../include/micro_maestro.h"
 
-void short_wait(); //Uses Sleep to give time back to other tasks
-void wait_for_deltat(struct timeval *tim, double *t2, double *t1, double *time_taken, double time_expected);  //no sleep (maintain cpu time)
+void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double *new_delta, double required_delta);  //no sleep (maintain cpu time)
 
 void stable_mode()
 {
@@ -22,7 +21,7 @@ void stable_mode()
 	gettimeofday(&tim, NULL);
 	t_x_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
 
-	short_wait();  //sleep using nanosleep() for a little less than DELTA_T/2
+
 	wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T/2); //Wait until Delta_T/2
 
 	// Initialise  PID parameters for the y-axis
@@ -33,7 +32,7 @@ void stable_mode()
 
 	while(!next_mode)
 	{
-		short_wait();  //sleep using nanosleep() for a little less than DELTA_T/2
+
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
 		x.pos_past = x.pos_curr;  //store past ball position
@@ -54,8 +53,6 @@ void stable_mode()
 		maestroSetTarget(fd, 0, target);
 		printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
 
-
-		short_wait();
 		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
 
 		y.pos_past = y.pos_curr;  //store past ball position
@@ -83,24 +80,25 @@ void stable_mode()
 }
 
 
-void short_wait()
+
+void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double *new_delta, double required_delta)
 {
+		// nanosleep for slightly less than time needed
 		struct timespec req = {0};
 		req.tv_sec = 0;
 		req.tv_nsec = (DELTA_T/2-1) * 1000000L;
 		nanosleep(&req, (struct timespec *)NULL);
-}
 
-void wait_for_deltat(struct timeval *tim, double *t2, double *t1, double *time_taken, double time_expected)
-{
+
+		//loop until time is reached
 		gettimeofday(tim, NULL);
-		(*t2)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
-		(*time_taken) = (*t2-*t1)*1000;
+		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
+		(*new_delta) = (*t_curr-*t_past)*1000;
 		
-		while(*time_taken < (time_expected-0.02)) //Wait till Delta_T/2 is reached
+		while(*new_delta < (required_delta-0.02)) //Wait till Delta_T/2 is reached
 		{
 			gettimeofday(tim, NULL);
 			(*t2)=tim->tv_sec+(tim->tv_usec/1000000.0); 
-			(*time_taken) = (*t2-*t1)*1000;
+			(*new_delta) = (*t2-*t_past)*1000;
 		}
 }

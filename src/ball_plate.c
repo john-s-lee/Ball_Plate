@@ -7,6 +7,7 @@
 #include "../include/ball_plate.h"
 #include "../include/wiimote_stuff.h"
 #include "../include/touchscreen.h"
+#include "../include/pid.h"
 
 
 //**************  Global Variables **************/
@@ -65,21 +66,7 @@ int main(int argc, char * argv[])
 			led_state = toggle_bit(led_state, CWIID_LED1_ON);
 			set_led_state(wiimote, led_state);
 			printf("Executing Ball Stabilization Mode\n");
-			while (!next_mode)
-			{
-				if (touchscreen_touched)
-				{
-					printf("\rCurrent X_Cord:  %f, Current Y_Cord:  %f ", x_cord, y_cord);
-					fflush(stdout);
-				}
-				else 
-				{
-					printf("\rTouchscreen not touched                                         ");
-					fflush(stdout);
-				}	
-				usleep(10000);
-			}
-
+			stable_mode();
 			printf("Leaving Ball Stabilization Mode\n\n");
 			next_mode = 0;
 		}
@@ -116,9 +103,19 @@ int main(int argc, char * argv[])
 			set_led_state(wiimote, led_state);
 			while (!next_mode)
 			{
-				printf("Executing Circle Mode\n");
-				sleep(1);
+				if (touchscreen_touched)
+				{
+					printf("\rCurrent X_Cord:  %f, Current Y_Cord:  %f ", x_cord, y_cord);
+					fflush(stdout);
+				}
+				else 
+				{
+					printf("\rTouchscreen not touched                                         ");
+					fflush(stdout);
+				}	
+				usleep(10000);
 			}
+			
 
 			printf("Leaving Circle Mode\n\n");
 			next_mode = 0;

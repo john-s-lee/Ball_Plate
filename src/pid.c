@@ -5,8 +5,8 @@
 #include "../include/ball_plate.h"
 #include "../include/micro_maestro.h"
 
-void pause();
-void wait_for_deltat(struct timeval *tim, double *t2, double *t1, double *time_taken, double time_expected);
+void short_wait(); //Uses Sleep to give time back to other tasks
+void wait_for_deltat(struct timeval *tim, double *t2, double *t1, double *time_taken, double time_expected);  //no sleep (maintain cpu time)
 
 void stable_mode()
 {
@@ -22,7 +22,7 @@ void stable_mode()
 	gettimeofday(&tim, NULL);
 	t_x_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
 
-	pause();  //sleep using nanosleep() for a little less than DELTA_T/2
+	short_wait();  //sleep using nanosleep() for a little less than DELTA_T/2
 	wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T/2); //Wait until Delta_T/2
 
 	// Initialise  PID parameters for the y-axis
@@ -33,7 +33,7 @@ void stable_mode()
 
 	while(!next_mode)
 	{
-		pause();  //sleep using nanosleep() for a little less than DELTA_T/2
+		short_wait();  //sleep using nanosleep() for a little less than DELTA_T/2
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
 		x.pos_past = x.pos_curr;  //store past ball position
@@ -47,7 +47,7 @@ void stable_mode()
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
 		
 		//Caluclate new control signal
-		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * DeltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
+		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
 
 		//Output Control Signal
 		target=(int)(x.u_act*(180/PI)*40+(4*X_SERVO_CENTRE));
@@ -55,7 +55,7 @@ void stable_mode()
 		printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
 
 
-		pause();
+		short_wait();
 		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
 
 		y.pos_past = y.pos_curr;  //store past ball position
@@ -69,11 +69,11 @@ void stable_mode()
 		y.u_D = (y.tauF/(y.tauF+deltaT_y/1000))*y.u_D_past + ((y.kc*y.tauD)/(y.tauF+deltaT_y/1000))*(y.pos_curr - y.pos_past);
 		
 		//Caluclate new control signal
-		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * DeltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
+		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
 		//Output control signal
 		target=(int)(y.u_act*(180/PI)*40+(4*Y_SERVO_CENTRE));
-		maestroSetTarget(fd, 0, target);
+		maestroSetTarget(fd, 1, target);
 		printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
 
 	}
@@ -83,7 +83,7 @@ void stable_mode()
 }
 
 
-void pause()
+void short_wait()
 {
 		struct timespec req = {0};
 		req.tv_sec = 0;

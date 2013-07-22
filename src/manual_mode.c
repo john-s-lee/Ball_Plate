@@ -41,13 +41,13 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		fflush(stdout);
 		if (current_axes ==0)
 		{
-			target=(int)(pitch*40+(4*1512.5));
+			target=(int)(pitch*40+(4*X_SERVO_CENTRE));
 			maestroSetTarget(fd, 0, target);
 			current_axes = 1;
 		}
 		else
 		{
-			target=(int)(roll*40+(4*1458));
+			target=(int)(roll*40+(4*Y_SERVO_CENTRE));
 			maestroSetTarget(fd, 1, target);
 			current_axes =0;
 		}

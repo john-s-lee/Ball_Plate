@@ -10,6 +10,21 @@ int init_maestro()
 	options.c_oflag &= ~(ONLCR | OCRNL);
 	tcsetattr(fd, TCSANOW, &options);
 
+	
+	//Set Acceleration limits for the servo as MAESTRO_ACC defined in micro_maestro.h
+	unsigned char command[] = {0x89, 0, MAESTRO_ACC & 0x7F, MAESTRO_ACC >> 7 & 0x7F};
+	if (write(fd, command, sizeof(command)) == -1)
+	{
+		perror("error writing");
+		return -1;
+	}
+	unsigned char command2[] = {0x89, 1, MAESTRO_ACC & 0x7F, MAESTRO_ACC >> 7 & 0x7F};
+	if (write(fd, command, sizeof(command)) == -1)
+	{
+		perror("error writing");
+		return -1;
+	}
+	
 	return fd;
 }
 

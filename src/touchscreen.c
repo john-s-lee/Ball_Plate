@@ -28,8 +28,8 @@ void * touchscreen_process()
 	while(1)
 	{
 			read(fd, &ev, sizeof(struct input_event));
-			if (ev.type == EV_ABS && ev.code==ABS_X) x_cord = ev.value;
- 			if (ev.type == EV_ABS && ev.code==ABS_Y) y_cord = ev.value;
+			if (ev.type == EV_ABS && ev.code==ABS_X) x_cord = ((double)ev.value-2018)/11.427;
+ 			if (ev.type == EV_ABS && ev.code==ABS_Y) y_cord = ((double)ev.value-2046)/14.694;
 			if (ev.type == EV_KEY && ev.code==BTN_TOUCH) touchscreen_touched = ev.value;
 	}
 

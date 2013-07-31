@@ -32,10 +32,10 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		if (a_z <= 0.0) {
 		roll += PI * ((a_x > 0.0) ? 1 : -1);
 		}
-		roll *= -1;
 		pitch = atan(a_y/a_z*cos(roll));
-		roll = roll * (180/PI);
-		pitch = pitch * (180/PI);
+		roll *= (-180/PI);
+		pitch *= (180/PI);
+
 
 		if ((i/50) > 1) printf("\rTime in Manual Mode: %i Seconds,   Pitch: %0.2f,  Roll:  %0.2f                           ", i/50 , pitch, roll);
 		fflush(stdout);
@@ -51,7 +51,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 			maestroSetTarget(fd, 1, target);
 			current_axes =0;
 		}
-		usleep(20000);
+		usleep(50000);
 		i++;
 	}
 	

@@ -48,7 +48,7 @@ void stable_mode()
 		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
 
 		//Output Control Signal
-		target=(int)((x.u_act*(4.2*180/PI))*40+(4*X_SERVO_CENTRE));
+		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
 		maestroSetTarget(fd, 0, target);
 		printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
 
@@ -67,7 +67,7 @@ void stable_mode()
 		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
 		//Output control signal
-		target=(int)(y.u_act*(4.2*-180/PI)*40+(4*Y_SERVO_CENTRE));
+		target=(int)(y.u_act*(2.4*-180/PI)*40+(4*Y_SERVO_CENTRE));
 		maestroSetTarget(fd, 1, target);
 		printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
 

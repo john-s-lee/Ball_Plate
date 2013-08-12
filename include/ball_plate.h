@@ -18,17 +18,20 @@
 #define CIRCLE_MODE 2
 #define SQUARE_MODE 3
 #define PI 3.14159
-#define X_SERVO_CENTRE 1579.75
-#define Y_SERVO_CENTRE 1402.75
+#define X_SERVO_CENTRE 1631.50
+#define Y_SERVO_CENTRE 1426.75
 
 // PID Parameters
-#define KC -0.4227
-#define TAU_I 1.7339
-#define TAU_D 0.6967
-#define TAU_F 0.1627
-#define DELTA_T 25  //DeltaT in ms
+#define KC -1.4392
+#define TAU_I 0.9265
+#define TAU_D 0.3793
+#define TAU_F 0.0868
+#define DELTA_T 10  //DeltaT in ms
+#define RES_DELTAT 10  //Resonant delta t in ms
+#define UMAX 0.261
+#define UMIN -0.261
 
-extern int next_mode, mode, two_button_pressed, touchscreen_touched;
+extern int next_mode, mode, two_button_pressed, touchscreen_touched, one_button_pressed;
 extern unsigned char rpt_mode;
 extern double x_cord, y_cord;
 

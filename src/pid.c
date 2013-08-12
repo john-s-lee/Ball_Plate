@@ -15,6 +15,13 @@ void stable_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past;
 	struct timeval tim;
 	double r_act = 0;
+	float x_pos[] = {-0.1, 0.1, 0.1, -0.1};
+	float y_pos[] = {0.1, 0.1, -0.1, -0.1};
+	int pos_current = 0;
+
+	one_button_pressed = 0;
+	two_button_pressed = 0;
+
 
 	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
 	pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
@@ -32,6 +39,24 @@ void stable_mode()
 
 	while(!next_mode)
 	{
+		if (one_button_pressed)
+		{
+			x.set_pt = 0;
+			y.set_pt = 0;
+			one_button_pressed = 0;
+		}
+
+		if (two_button_pressed)
+		{
+			x.set_pt = x_pos[pos_current];
+			y.set_pt = y_pos[pos_current];
+			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
+			pos_current++;
+			pos_current = pos_current%4;
+			two_button_pressed = 0;
+		}
+
+
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
@@ -47,10 +72,13 @@ void stable_mode()
 		//Caluclate new control signal
 		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
 
+		if (x.u_act > UMAX) x.u_act = UMAX;
+		if (x.u_act < UMIN) x.u_act = UMIN;
+
 		//Output Control Signal
 		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
 		maestroSetTarget(fd, 0, target);
-		printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
+		//printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
 
 		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
 
@@ -66,10 +94,13 @@ void stable_mode()
 		//Caluclate new control signal
 		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
+		if (x.u_act > UMAX) x.u_act = UMAX;
+		if (x.u_act < UMIN) x.u_act = UMIN;
+
 		//Output control signal
-		target=(int)(y.u_act*(2.4*-180/PI)*40+(4*Y_SERVO_CENTRE));
+		target=(int)(y.u_act*(2.4*180/PI)*40+(4*Y_SERVO_CENTRE));
 		maestroSetTarget(fd, 1, target);
-		printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
+		//printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
 
 	}
 

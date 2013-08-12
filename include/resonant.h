@@ -1,0 +1,2 @@
+void circle_mode();
+

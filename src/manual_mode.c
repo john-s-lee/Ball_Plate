@@ -35,19 +35,21 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		pitch = atan(a_y/a_z*cos(roll));
 		roll *= (-180/PI);
 		pitch *= (180/PI);
+		roll *= 0.5;
+		pitch *= 0.5;
 
 
 		if ((i/50) > 1) printf("\rTime in Manual Mode: %i Seconds,   Pitch: %0.2f,  Roll:  %0.2f                           ", i/50 , pitch, roll);
 		fflush(stdout);
 		if (current_axes ==0)
 		{
-			target=(int)(pitch*40+(4*X_SERVO_CENTRE));
+			target=(int)(2.4*pitch*40+(4*X_SERVO_CENTRE));
 			maestroSetTarget(fd, 0, target);
 			current_axes = 1;
 		}
 		else
 		{
-			target=(int)(roll*40+(4*Y_SERVO_CENTRE));
+			target=(int)(2.4*roll*40+(4*Y_SERVO_CENTRE));
 			maestroSetTarget(fd, 1, target);
 			current_axes =0;
 		}

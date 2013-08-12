@@ -35,6 +35,12 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 					two_button_pressed = 1;
 			}
 
+			if (mesg[i].btn_mesg.buttons & CWIID_BTN_1)
+			{
+					printf("1 Button Pressed!!\n");
+					one_button_pressed = 1;
+			}
+
 		}
 
 		

@@ -8,6 +8,7 @@
 #include "../include/wiimote_stuff.h"
 #include "../include/touchscreen.h"
 #include "../include/pid.h"
+#include "../include/resonant.h"
 
 
 //**************  Global Variables **************/
@@ -15,6 +16,7 @@ cwiid_mesg_callback_t cwiid_callback;
 cwiid_err_t err;
 int next_mode, mode;
 int two_button_pressed = 0;
+int one_button_pressed = 0;
 unsigned char rpt_mode = 0;
 
 //**************   Main Function   **************/
@@ -101,21 +103,8 @@ int main(int argc, char * argv[])
 			led_state = 0;
 			led_state=toggle_bit(led_state, CWIID_LED3_ON);
 			set_led_state(wiimote, led_state);
-			while (!next_mode)
-			{
-				if (touchscreen_touched)
-				{
-					printf("\rCurrent X_Cord:  %f, Current Y_Cord:  %f ", x_cord, y_cord);
-					fflush(stdout);
-				}
-				else 
-				{
-					printf("\rTouchscreen not touched                                         ");
-					fflush(stdout);
-				}	
-				usleep(10000);
-			}
 			
+			circle_mode();		
 
 			printf("Leaving Circle Mode\n\n");
 			next_mode = 0;

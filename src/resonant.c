@@ -27,42 +27,13 @@ void circle_mode()
 
 	double cycles = 0;
 
-
 	gettimeofday(&tim, NULL);
 	t_start=tim.tv_sec+(tim.tv_usec/1000000.0); 
+	t_ypast = 0;
 
-
-	////////  x-time initialisation
-	gettimeofday(&tim, NULL);
-	t_xpast=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
-	usleep(RES_DELTAT/2*1000-1000);
-	gettimeofday(&tim, NULL);
-	t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
-	 
-
-
-	while((t_xcurr-t_xpast)*1000 < (RES_DELTAT/2-0.02)) //Wait till Delta_T/2 is reached
-	{
-		gettimeofday(&tim, NULL);
-		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0); 
-	}
-	gettimeofday(&tim, NULL);
-	t_ypast=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
-		cycles ++;
 	
 	while(!next_mode)
 	{
-		usleep(RES_DELTAT/2*1000-1000);
-		gettimeofday(&tim, NULL);
-		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
-
-		while((t_xcurr-t_xpast)*1000 < (RES_DELTAT-0.02)) //Wait till Delta_T/2 is reached
-		{
-			gettimeofday(&tim, NULL);
-			t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0); 
-		}
-		cycles ++;
-
 		r_x = 0.07*sin(w0*cycles*RES_DELTAT/2000);   //calculate setpoint signal;
 		for (i = 5; i > 0; i--) e_x[i] = e_x[i-1]; 
 		for (i = 5; i > 0; i--) u_x[i] = u_x[i-1];
@@ -77,21 +48,22 @@ void circle_mode()
 
 		t_xpast = t_xcurr;
 
-		usleep(RES_DELTAT/2*1000-1000);
 		gettimeofday(&tim, NULL);
 		t_ycurr=tim.tv_sec+(tim.tv_usec/1000000.0);
 
-		while((t_ycurr-t_ypast)*1000 < (RES_DELTAT-0.02)) //Wait till Delta_T/2 is reached
-		{
-			gettimeofday(&tim, NULL);
-			t_ycurr=tim.tv_sec+(tim.tv_usec/1000000.0); 
-		}		
+
+		nanosleep((struct timespec[]){{0, ((RES_DELTA-(t_ycurr-t_ypast)) * 1000000L)}}, NULL);
+		
+	
+		gettimeofday(&tim, NULL);
+		t_ycurr=tim.tv_sec+(tim.tv_usec/1000000.0);
+
 		cycles ++;
 
 		r_y = 0.07*sin(w0*cycles*RES_DELTAT/2000);   //calculate setpoint signal;
 		printf("r_y = %f \n", 0.07*sin(w0*cycles*RES_DELTAT/2000));
-		for (i = 4; i > 0; i--) e_y[i] = e_y[i-1];
-		for (i = 4; i > 0; i--) u_y[i] = u_y[i-1];
+		for (i = 5; i > 0; i--) e_y[i] = e_y[i-1];
+		for (i = 5; i > 0; i--) u_y[i] = u_y[i-1];
 
 		e_y[0] = r_y - y_cord/1000;
 		printf("ey 0 = %f\n", e_y[0]);
@@ -102,6 +74,15 @@ void circle_mode()
 		maestroSetTarget(fd, 1, target);
 		//printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
 		t_ypast = t_ycurr;
+
+		gettimeofday(&tim, NULL);
+		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
+
+		nanosleep((struct timespec[]){{0, ((RES_DELTA-(t_ycurr-t_ypast)) * 1000000L)}}, NULL);
+	
+		gettimeofday(&tim, NULL);
+		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
+
 	}
 
 	close_maestro(fd);

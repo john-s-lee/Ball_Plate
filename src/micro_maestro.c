@@ -12,13 +12,13 @@ int init_maestro()
 
 	
 	//Set Acceleration limits for the servo as MAESTRO_ACC defined in micro_maestro.h
-	unsigned char command[] = {0x89, 0, MAESTRO_ACC & 0x7F, MAESTRO_ACC >> 7 & 0x7F};
+	unsigned char command[] = {0x87, 0, MAESTRO_SPEED & 0x7F, MAESTRO_SPEED >> 7 & 0x7F};
 	if (write(fd, command, sizeof(command)) == -1)
 	{
 		perror("error writing");
 		return -1;
 	}
-	unsigned char command2[] = {0x89, 1, MAESTRO_ACC & 0x7F, MAESTRO_ACC >> 7 & 0x7F};
+	unsigned char command2[] = {0x87, 1, MAESTRO_SPEED & 0x7F, MAESTRO_SPEED >> 7 & 0x7F};
 	if (write(fd, command, sizeof(command)) == -1)
 	{
 		perror("error writing");

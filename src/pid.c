@@ -15,8 +15,8 @@ void stable_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past;
 	struct timeval tim;
 	double r_act = 0;
-	float x_pos[] = {-0.1, 0.1, 0.1, -0.1};
-	float y_pos[] = {0.1, 0.1, -0.1, -0.1};
+	float x_pos[] = {-0.075, 0.075, 0.075, -0.075};
+	float y_pos[] = {0.075, 0.075, -0.075, -0.075};
 	int pos_current = 0;
 
 	one_button_pressed = 0;
@@ -112,22 +112,19 @@ void stable_mode()
 
 void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double *new_delta, double required_delta)
 {
-		// nanosleep for slightly less than time needed
-		struct timespec req = {0};
-		req.tv_sec = 0;
-		req.tv_nsec = (DELTA_T/2-1) * 1000000L;
-		nanosleep(&req, (struct timespec *)NULL);
-
-
-		//loop until time is reached
 		gettimeofday(tim, NULL);
 		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
-		
-		while(*new_delta < (required_delta-0.02)) //Wait till Delta_T/2 is reached
-		{
-			gettimeofday(tim, NULL);
-			(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
-			(*new_delta) = (*t_curr-*t_past)*1000;
-		}
+
+
+		// nanosleep for slightly less than time needed
+		struct timespec req = {0};
+		req.tv_sec = 0;
+		req.tv_nsec = (required_delta - *new_delta) * 1000000L;
+		nanosleep(&req, (struct timespec *)NULL);
+
+
+		gettimeofday(tim, NULL);
+		(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
+		(*new_delta) = (*t_curr-*t_past)*1000;
 }

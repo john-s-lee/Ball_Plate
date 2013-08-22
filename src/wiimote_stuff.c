@@ -13,20 +13,43 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 		if (mesg[i].type == CWIID_MESG_BTN)
 		{
 
+			if (mesg[i].btn_mesg.buttons & CWIID_BTN_PLUS) 
+			{
+					printf("Plus Button Pressed!!\n");
+					mode = (mode+1)%3;
+					next_mode++;
+			}
+
+			if (mesg[i].btn_mesg.buttons & CWIID_BTN_MINUS)
+			{
+					printf("Minus Button Pressed!!\n");
+					if (mode == 0) mode = 2;
+					else mode--;
+					next_mode++;
+			}
+
 			if (mesg[i].btn_mesg.buttons & DOWN_BUTTON) 
 			{
 					printf("Down Button Pressed!!\n");
-					if (mode == 0) mode = 3;
-					else mode--;
-					next_mode++;
-
+					down_button_pressed = 1;
 			}
 
 			if (mesg[i].btn_mesg.buttons & UP_BUTTON)
 			{
 					printf("Up Button Pressed!!\n");
-					mode = (mode+1)%4;
-					next_mode++;
+					up_button_pressed = 1;
+			}
+
+			if (mesg[i].btn_mesg.buttons & LEFT_BUTTON) 
+			{
+					printf("Left Button Pressed!!\n");
+					left_button_pressed = 1;
+			}
+
+			if (mesg[i].btn_mesg.buttons & RIGHT_BUTTON)
+			{
+					printf("Right Button Pressed!!\n");
+					right_button_pressed = 1;
 			}
 
 			if (mesg[i].btn_mesg.buttons & CWIID_BTN_2)

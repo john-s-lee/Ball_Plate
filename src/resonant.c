@@ -1,92 +1,145 @@
 
 #include <stdio.h>
 #include <sys/time.h>
+#include <time.h>
+#include <math.h>
 #include "pid.h"
 #include "../include/ball_plate.h"
 #include "../include/micro_maestro.h"
-#include "../include/resonant.h"
+#include "../include/playsound.h"
 
 
 void circle_mode()
 {
 	int fd = init_maestro();
 	int target; //Micro Maestro target value
-	double t_start, t_xpast, t_xcurr, t_ypast, t_ycurr;
+	double deltaT_x, deltaT_y;
+	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_start, t_curr;
 	struct timeval tim;
-	double r_x;
-	double r_y;
-	float w0 = 0.3491;
-	int i = 0;
+	double r_act = 0;
+	float x_pos[] = {-0.075, 0.075, 0.075, -0.075};
+	float y_pos[] = {0.075, 0.075, -0.075, -0.075};
+	int pos_current = 0;
+	float mode_circles = 1;
+	double x_amplitude = 0.12;
+	double y_amplitude = 0.12;
 
-	float numd[] = {-1.6231,    6.4457,   -9.5994,    6.3540,   -1.5773};
-	float dend[] = {1.0000,   -3.8735,    5.6205,   -3.6205,    0.8735};
-	float e_x[] = {0, 0, 0, 0, 0, 0};
-	float u_x[] = {0, 0, 0, 0, 0, 0};
-	float e_y[] = {0, 0, 0, 0, 0, 0};
-	float u_y[] = {0, 0, 0, 0, 0, 0};
+	double x_offset = PI/2;
+	double y_offset = 0;
 
-	double cycles = 0;
+	one_button_pressed = 0;
+	two_button_pressed = 0;
+	double w0 = pow(3, -1)*2*PI;
 
+
+	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
+	pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
 	gettimeofday(&tim, NULL);
-	t_start=tim.tv_sec+(tim.tv_usec/1000000.0); 
-	t_ypast = 0;
+	t_x_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
 
-	
+
+	wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T/2); //Wait until Delta_T/2
+
+	// Initialise  PID parameters for the y-axis
+	pid_params y = {KC, TAU_I, TAU_D, TAU_F, 0, 0, y_cord/1000, 0, 0, 0, 0, 0}; //initialise PID paramaters for y axis
+	gettimeofday(&tim, NULL);
+	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
+	t_start = t_y_past;
+
 	while(!next_mode)
 	{
-		r_x = 0.07*sin(w0*cycles*RES_DELTAT/2000);   //calculate setpoint signal;
-		for (i = 5; i > 0; i--) e_x[i] = e_x[i-1]; 
-		for (i = 5; i > 0; i--) u_x[i] = u_x[i-1];
+		if (one_button_pressed)
+		{
+			playsound("/usr/share/sounds/ball_plate/reverse.wav");
+			if (mode_circles == 1){			
+			if (x_offset == PI/2) x_offset = 3*PI/2;
+			else x_offset = PI/2;}
+			else{
+			if (y_offset == 0) y_offset = PI;
+			else y_offset = 0;}
+			one_button_pressed = 0;
+		}
 
-		e_x[0] = r_x - x_cord/1000;
-		u_x[0] =  u_x[1] + numd[0]*e_x[0]  +numd[1]*e_x[1]  +numd[2]*e_x[2]  +numd[3]*e_x[3] +numd[4]*e_x[4] - dend[1]*u_x[1] - dend[2]*u_x[2] - dend[3]*u_x[3] - dend[4]*u_x[4] - (numd[0]*e_x[1]  +numd[1]*e_x[2]  +numd[2]*e_x[3]  +numd[3]*e_x[4] +numd[4]*e_x[5] - dend[1]*u_x[2] - dend[2]*u_x[3] - dend[3]*u_x[4] - dend[4]*u_x[5]);
+		if (two_button_pressed)
+		{
+			if (mode_circles == 1) 
+			{
+				playsound("/usr/share/sounds/ball_plate/figure_8.wav");
+				mode_circles = 0.5;
+				x_offset = 0;
+				y_offset = 0;
+				y_amplitude *= 0.5;
+			}
+			else 
+			{
+				playsound("/usr/share/sounds/ball_plate/circle.wav");
+				mode_circles = 1;
+				x_offset = PI/2;
+				y_offset = 0;
+				y_amplitude *= 2;
+			}
+			two_button_pressed = 0;
+		}
+
+
+
+		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
+		t_curr = t_x_curr-t_start;
+		x.set_pt = x_amplitude*sin(mode_circles*w0*t_curr + x_offset);
+	
+		x.pos_past = x.pos_curr;  //store past ball position
+		x.pos_curr = x_cord/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		x.u_D_past = x.u_D;  //store past derivative control signal
+		x.u_act_past = x.u_act;  //store past control signal
+		x.error = (x.set_pt - x.pos_curr); //calculate error r(t) - y(t)
+		t_x_past = t_x_curr;  //Save new time
+
+		//Calculate new derivative term
+		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
+		//Caluclate new control signal
+		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
+
+		if (x.u_act > UMAX) x.u_act = UMAX;
+		if (x.u_act < UMIN) x.u_act = UMIN;
 
 		//Output Control Signal
-		target=(int)((u_x[0]*(2.4*-180/PI))*40+(4*X_SERVO_CENTRE));
+		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
 		maestroSetTarget(fd, 0, target);
 		//printf("Test Control Signal u_act_x = %f degrees\n", x.u_act*(180/PI));
 
-		t_xpast = t_xcurr;
+		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
+		t_curr = t_y_curr-t_start;
+		y.set_pt = y_amplitude*sin(w0*t_curr + y_offset);
 
-		gettimeofday(&tim, NULL);
-		t_ycurr=tim.tv_sec+(tim.tv_usec/1000000.0);
+		y.pos_past = y.pos_curr;  //store past ball position
+		y.pos_curr = y_cord/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		y.u_D_past = y.u_D;  //store past derivative control signal
+		y.u_act_past = y.u_act;
+		y.error = (y.set_pt - y.pos_curr);
+		t_y_past = t_y_curr;  //Save new time
 
+		//Calculate new derivative term
+		y.u_D = (y.tauF/(y.tauF+deltaT_y/1000))*y.u_D_past + ((y.kc*y.tauD)/(y.tauF+deltaT_y/1000))*(y.pos_curr - y.pos_past);
+		//Caluclate new control signal
+		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
-		nanosleep((struct timespec[]){{0, ((RES_DELTA-(t_ycurr-t_ypast)) * 1000000L)}}, NULL);
-		
-	
-		gettimeofday(&tim, NULL);
-		t_ycurr=tim.tv_sec+(tim.tv_usec/1000000.0);
-
-		cycles ++;
-
-		r_y = 0.07*sin(w0*cycles*RES_DELTAT/2000);   //calculate setpoint signal;
-		printf("r_y = %f \n", 0.07*sin(w0*cycles*RES_DELTAT/2000));
-		for (i = 5; i > 0; i--) e_y[i] = e_y[i-1];
-		for (i = 5; i > 0; i--) u_y[i] = u_y[i-1];
-
-		e_y[0] = r_y - y_cord/1000;
-		printf("ey 0 = %f\n", e_y[0]);
-		u_y[0] =  u_y[1] + numd[0]*e_y[0]  +numd[1]*e_y[1]  +numd[2]*e_y[2]  +numd[3]*e_y[3] +numd[4]*e_y[4] - dend[1]*u_y[1] - dend[2]*u_y[2] - dend[3]*u_y[3] - dend[4]*u_y[4] - (numd[0]*e_y[1]  +numd[1]*e_y[2]  +numd[2]*e_y[3]  +numd[3]*e_y[4] +numd[4]*e_y[5] - dend[1]*u_y[2] - dend[2]*u_y[3] - dend[3]*u_y[4] - dend[4]*u_y[5]);		
+		if (x.u_act > UMAX) x.u_act = UMAX;
+		if (x.u_act < UMIN) x.u_act = UMIN;
 
 		//Output control signal
-		target=(int)(u_y[0]*(2.4*-180/PI)*40+(4*Y_SERVO_CENTRE));
+		target=(int)(y.u_act*(2.4*180/PI)*40+(4*Y_SERVO_CENTRE));
 		maestroSetTarget(fd, 1, target);
 		//printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
-		t_ypast = t_ycurr;
-
-		gettimeofday(&tim, NULL);
-		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
-
-		nanosleep((struct timespec[]){{0, ((RES_DELTA-(t_ycurr-t_ypast)) * 1000000L)}}, NULL);
-	
-		gettimeofday(&tim, NULL);
-		t_xcurr=tim.tv_sec+(tim.tv_usec/1000000.0);
 
 	}
 
 	close_maestro(fd);
 	return;
 }
+
+
+
+
+
 
 

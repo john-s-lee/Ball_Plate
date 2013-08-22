@@ -18,6 +18,10 @@ int next_mode, mode;
 int two_button_pressed = 0;
 int one_button_pressed = 0;
 unsigned char rpt_mode = 0;
+unsigned char up_button_pressed = 0;
+unsigned char down_button_pressed = 0;
+unsigned char left_button_pressed = 0;
+unsigned char right_button_pressed = 0;
 
 //**************   Main Function   **************/
 int main(int argc, char * argv[])
@@ -37,7 +41,7 @@ int main(int argc, char * argv[])
 
 	//Connect to wiimote
 	printf("Put Wiimote in discoverable mode now (press 1+2)...\n");
-	playsound("/usr/share/sounds/ball_plate/pair_remote.wav");
+	playsound("/usr/share/sounds/ball_plate/greeting.wav");
 	while (!(wiimote = cwiid_open(&bdaddr, 0))) fprintf(stderr, "Unable to connect to wiimote\n");
 	printf("Wiimote Connected.\n\n");
 
@@ -48,6 +52,7 @@ int main(int argc, char * argv[])
 		return 0;
 	}
 
+
 	rpt_mode = toggle_bit(rpt_mode, CWIID_RPT_BTN);
 	set_rpt_mode(wiimote, rpt_mode);  //enable button pressed messages for callback
 
@@ -57,13 +62,14 @@ int main(int argc, char * argv[])
 		return 0;
 	}
 	
-
+	cwiid_enable(wiimote, CWIID_FLAG_CONTINUOUS);
 
 	while (1)
 	{
 		if (mode == STABLE_MODE)
 		{
 			printf("Initialising Ball Stabilization Mode\n");
+			playsound("/usr/share/sounds/ball_plate/disturbance.wav");
 			led_state = 0;
 			led_state = toggle_bit(led_state, CWIID_LED1_ON);
 			set_led_state(wiimote, led_state);
@@ -76,30 +82,19 @@ int main(int argc, char * argv[])
 		if (mode == MANUAL_MODE)
 		{
 			printf("Initialising Manual Control Mode\n");
-			playsound("/usr/share/sounds/ball_plate/manual_start.wav");
+			playsound("/usr/share/sounds/ball_plate/manual.wav");
 			led_state = 0;
 			led_state=toggle_bit(led_state, CWIID_LED2_ON);
 			set_led_state(wiimote, led_state);
-			two_button_pressed = 0;
-			printf("Waiting for 2 Button on Wiimote to be pressed......\n");
-			while (!next_mode)
-			{
-				if (two_button_pressed)  //Do this section once 2 button is pressed.
-				{
-					playsound("/usr/share/sounds/ball_plate/bodyjar.wav");
-					manual_mode(wiimote);
-				}
-				usleep(10000);
-			}
-
+			manual_mode(wiimote);
 			printf("Leaving Manual Control Mode\n\n");
-			stopsound();
 			next_mode = 0;
 		}
 
 		if (mode == CIRCLE_MODE)
 		{
 			printf("Initialising Circle Mode\n");
+			playsound("/usr/share/sounds/ball_plate/resonant.wav");
 			led_state = 0;
 			led_state=toggle_bit(led_state, CWIID_LED3_ON);
 			set_led_state(wiimote, led_state);
@@ -109,7 +104,7 @@ int main(int argc, char * argv[])
 			printf("Leaving Circle Mode\n\n");
 			next_mode = 0;
 		}
-
+		/*
 		if (mode == SQUARE_MODE)
 		{
 			printf("Initialising Sqaure Mode\n");
@@ -124,7 +119,7 @@ int main(int argc, char * argv[])
 
 			printf("Leaving Square Mode\n\n");
 			next_mode =0;
-		}
+		}*/
 		
 		
 	}

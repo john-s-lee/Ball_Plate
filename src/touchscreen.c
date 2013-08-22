@@ -22,14 +22,17 @@ void init_touchscreen()
 void * touchscreen_process()
 {
 	struct input_event ev;
-	int fd;
+	int fd, i;
 	fd=open("/dev/input/eGalax",O_RDONLY);
+	double time_past = 0;
+	double time_curr = 0;
+
 
 	while(1)
 	{
 			read(fd, &ev, sizeof(struct input_event));
-			if (ev.type == EV_ABS && ev.code==ABS_X) x_cord = ((double)ev.value-2018)/11.427;
- 			if (ev.type == EV_ABS && ev.code==ABS_Y) y_cord = ((double)-ev.value+2046)/14.694;
+			if (ev.type == EV_ABS && ev.code==ABS_X) x_cord =((double)ev.value-2018)/11.427;
+ 			if (ev.type == EV_ABS && ev.code==ABS_Y)y_cord = ((double)-ev.value+2046)/14.694;
 			if (ev.type == EV_KEY && ev.code==BTN_TOUCH) touchscreen_touched = ev.value;
 	}
 

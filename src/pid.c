@@ -24,7 +24,7 @@ void stable_mode()
 	maestroSetTarget(fd, 1, 4*Y_SERVO_CENTRE);
 	usleep(20000);
 	maestroSetTarget(fd, 0, 4*X_SERVO_CENTRE);	
-	usleep(300000);
+	usleep(400000);
 	maestroSetSpeed(fd, 0);	
 	
 	
@@ -75,10 +75,8 @@ void stable_mode()
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
-		printf("DeltaT = %f\n", deltaT_x);
 		x.pos_past = x.pos_curr;  //store past ball position
 		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000;  //Get balls position from 2nd order estimator
-		//x.pos_curr = x_cord/1000;
 		x.u_D_past = x.u_D;  //store past derivative control signal
 		x.u_act_past = x.u_act;  //store past control signal
 		x.error = (x.set_pt - x.pos_curr); //calculate error r(t) - y(t)
@@ -88,6 +86,7 @@ void stable_mode()
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
 		//Caluclate new control signal
 		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
+
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;

@@ -24,7 +24,7 @@ void stable_mode()
 	maestroSetTarget(fd, 1, 4*Y_SERVO_CENTRE);
 	usleep(20000);
 	maestroSetTarget(fd, 0, 4*X_SERVO_CENTRE);	
-	usleep(400000);
+	usleep(500000);
 	maestroSetSpeed(fd, 0);	
 	
 	
@@ -50,7 +50,7 @@ void stable_mode()
 	pid_params y = {KC, TAU_I, TAU_D, TAU_F, 0, 0, y_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
-
+	double t_start = t_y_past;
 
 	while(!next_mode)
 	{
@@ -75,6 +75,8 @@ void stable_mode()
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
+			printf("tcurr = %f\n", t_x_curr - t_start);
+
 		x.pos_past = x.pos_curr;  //store past ball position
 		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000;  //Get balls position from 2nd order estimator
 		x.u_D_past = x.u_D;  //store past derivative control signal
@@ -135,15 +137,24 @@ void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double
 		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
 
+		struct timespec t_curr_spec, t_delta_spec;
+		clock_gettime(CLOCK_MONOTONIC, &t_curr_spec);
+		//printf("current ns= %ld\n", t_curr_spec.tv_nsec);
+
+		long int new_delta_long = required_delta*1000000-*new_delta*1000000;
+
+		long int new_delta_long_secs = t_curr_spec.tv_sec + ((double)t_curr_spec.tv_nsec/1000000000 + (double)new_delta_long/1000000000);
+		new_delta_long = (t_curr_spec.tv_nsec+new_delta_long)%1000000000;
+
+		t_delta_spec.tv_sec =new_delta_long_secs;
+		t_delta_spec.tv_nsec = new_delta_long;
+
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t_delta_spec, NULL);
+
 
 		gettimeofday(tim, NULL);
-		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
+		(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
 
-		while(*new_delta < (required_delta-0.02)) //Wait till Delta_T/2 is reached
-		{
-			gettimeofday(tim, NULL);
-			(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
-			(*new_delta) = (*t_curr-*t_past)*1000;
-		}
+
 }

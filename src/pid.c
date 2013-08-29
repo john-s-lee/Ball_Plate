@@ -13,12 +13,13 @@ void stable_mode()
 	int fd = init_maestro();
 	int target; //Micro Maestro target value
 	double deltaT_x, deltaT_y;
-	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr;
+	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr, t_start;
 	struct timeval tim;
 	double r_act = 0;
 	float x_pos[] = {-0.075, 0.075, 0.075, -0.075};
 	float y_pos[] = {0.075, 0.075, -0.075, -0.075};
-	int pos_current = 0;
+	int pos_current = 2;
+	int i = 0;
 
 	maestroSetSpeed(fd, 20);
 	maestroSetTarget(fd, 1, 4*Y_SERVO_CENTRE);
@@ -50,9 +51,36 @@ void stable_mode()
 	pid_params y = {KC, TAU_I, TAU_D, TAU_F, 0, 0, y_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
+	
+	t_start = t_y_past;
+	FILE *fp_timex;
+	fp_timex = fopen("timex.txt", "w");
+	fprintf(fp_timex, "time_x\n");
+	FILE *fp_timey;
+	fp_timey = fopen("timey.txt", "w");
+	fprintf(fp_timey, "time_y\n");
+	FILE *fp_x_pos;
+	fp_x_pos = fopen("x_pos.txt", "w");
+	fprintf(fp_x_pos, "x\n");
+	FILE *fp_y_pos;
+	fp_y_pos = fopen("y_pos.txt", "w");
+	fprintf(fp_y_pos, "y\n");
+	FILE *fp_u_x;
+	fp_u_x = fopen("u_x.txt", "w");
+	fprintf(fp_u_x, "x_star\n");
+	FILE *fp_u_y;
+	fp_u_y = fopen("u_y.txt", "w");
+	fprintf(fp_u_y, "y_star\n");
 
 
-	while(!next_mode)
+			x.set_pt = x_pos[pos_current];
+			y.set_pt = y_pos[pos_current];
+			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
+			pos_current++;
+			pos_current = pos_current%4;
+
+
+	for (i = 0; i < 3000; i++)   //Run for 10 seconds
 	{
 		if (one_button_pressed)
 		{
@@ -63,15 +91,16 @@ void stable_mode()
 
 		if (two_button_pressed)
 		{
-			x.set_pt = x_pos[pos_current];
-			y.set_pt = y_pos[pos_current];
-			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
-			pos_current++;
-			pos_current = pos_current%4;
+
 			two_button_pressed = 0;
 		}
 
-
+		if (i%250 == 0){
+						x.set_pt = x_pos[pos_current];
+			y.set_pt = y_pos[pos_current];
+			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
+			pos_current++;
+			pos_current = pos_current%4;}
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
@@ -86,6 +115,10 @@ void stable_mode()
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
 		//Caluclate new control signal
 		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
+
+		fprintf(fp_timex, "%f\n", t_x_curr-t_start);
+		fprintf(fp_x_pos, "%f\n", x.pos_curr);
+		fprintf(fp_u_x, "%f\n", x.set_pt);
 
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
@@ -112,6 +145,12 @@ void stable_mode()
 		//Caluclate new control signal
 		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
+		fprintf(fp_timey, "%f\n", t_y_curr-t_start);
+		fprintf(fp_y_pos, "%F\n", y.pos_curr);
+		fprintf(fp_u_y, "%f\n", y.set_pt);
+
+
+
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 		
@@ -123,6 +162,12 @@ void stable_mode()
 
 	}
 
+	fclose(fp_timex);
+	fclose(fp_timey);
+	fclose(fp_x_pos);
+	fclose(fp_y_pos);
+	fclose(fp_u_x);
+	fclose(fp_u_y);
 	close_maestro(fd);
 	return;
 }

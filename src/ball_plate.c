@@ -82,6 +82,7 @@ int main(int argc, char * argv[])
 			printf("Executing Ball Stabilization Mode\n");
 			stable_mode();
 			printf("Leaving Ball Stabilization Mode\n\n");
+			return 0;
 			next_mode = 0;
 		}
 

@@ -22,10 +22,10 @@
 #define Y_SERVO_CENTRE 1492
 
 // PID Parameters
-#define KC -1.5982
-#define TAU_I 0.8917
-#define TAU_D 0.3583
-#define TAU_F 0.0837
+#define KC -1.1742
+#define TAU_I 1.0404
+#define TAU_D 0.4180
+#define TAU_F 0.0976
 #define DELTA_T 10  //DeltaT in ms
 
 

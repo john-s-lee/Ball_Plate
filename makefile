@@ -10,7 +10,7 @@ LIBS=-lm -lbluetooth -lcwiid -lpthread
 _DEPS = ball_plate.h manual_mode.h micro_maestro.h playsound.h wiimote_stuff.h touchscreen.h pid.h resonant.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = ball_plate.o manual_mode.o micro_maestro.o playsound.o wiimote_stuff.o touchscreen.o pid.o resonant.o
+_OBJ = ball_plate.o manual_mode.o micro_maestro.o playsound.o wiimote_stuff.o touchscreen.o pid.o resonant.o maze.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

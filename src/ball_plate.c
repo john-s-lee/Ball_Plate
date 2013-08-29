@@ -22,6 +22,10 @@ unsigned char up_button_pressed = 0;
 unsigned char down_button_pressed = 0;
 unsigned char left_button_pressed = 0;
 unsigned char right_button_pressed = 0;
+double t_measuredy = 0;
+double t_measuredx = 0;
+double measuredx_dot = 0;
+double measuredy_dot = 0;
 
 //**************   Main Function   **************/
 int main(int argc, char * argv[])
@@ -104,22 +108,18 @@ int main(int argc, char * argv[])
 			printf("Leaving Circle Mode\n\n");
 			next_mode = 0;
 		}
-		/*
-		if (mode == SQUARE_MODE)
+		
+		if (mode == MAZE_MODE)
 		{
 			printf("Initialising Sqaure Mode\n");
 			led_state =0;
 			led_state=toggle_bit(led_state, CWIID_LED4_ON);
 			set_led_state(wiimote, led_state);
-			while (!next_mode)
-			{
-				printf("Executing Square Mode\n");
-				sleep(1);
-			}
-
+			printf("Executing Square Mode\n");
+			maze_mode();
 			printf("Leaving Square Mode\n\n");
 			next_mode =0;
-		}*/
+		}
 		
 		
 	}

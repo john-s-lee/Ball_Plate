@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <sys/time.h>
 #include <stdlib.h>
@@ -6,9 +5,7 @@
 #include "../include/ball_plate.h"
 #include "../include/micro_maestro.h"
 
-void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double *new_delta, double required_delta);  //no sleep (maintain cpu time)
-
-void stable_mode()
+void maze_mode()
 {
 	int fd = init_maestro();
 	int target; //Micro Maestro target value
@@ -16,30 +13,22 @@ void stable_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr;
 	struct timeval tim;
 	double r_act = 0;
-	float x_pos[] = {-0.075, 0.075, 0.075, -0.075};
-	float y_pos[] = {0.075, 0.075, -0.075, -0.075};
+	float x_pos[] = {0.11, 0.11, 0.15, 0.15, 0.11, 0.11, 0.06, 0.06, 0.01, 0.01, -0.03,  -0.03, -0.07, -0.07, -0.11,  -0.115, -0.14,  -0.14,   -0.1,  -0.1, -0.14, -0.14,  -0.105,  -0.105,  -0.135,  -0.135,  -0.08,  -0.08,  -0.02, -0.02, 0.035, 0.035,  0.095, 0.095,  0.15,  0.15, 0.11, 0.11,  0.15, 	 0.15};
+	float y_pos[] = {-0.015, -0.045, -0.045, -0.115, -0.115, -0.105,  -0.105, -0.12, -0.12, -0.1, -0.1,  -0.12, -0.12, -0.1, -0.1, -0.12, -0.12, -0.07, -0.07, -0.04, -0.04,  0.005, 0.005,  0.05,  0.05, 0.11,  0.11,  0.095, 0.095, 0.11, 0.11,  0.095,  0.095,  0.115, 0.115, 0.065,  0.065,  0.035,  0.035,  -0.01};  
 	int pos_current = 0;
 
-	maestroSetSpeed(fd, 20);
-	maestroSetTarget(fd, 1, 4*Y_SERVO_CENTRE);
-	usleep(20000);
-	maestroSetTarget(fd, 0, 4*X_SERVO_CENTRE);	
-	usleep(300000);
-	maestroSetSpeed(fd, 0);	
-	
-	
-	one_button_pressed = 0;
-	two_button_pressed = 0;
+
 
 	gettimeofday(&tim, NULL);
 	t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
 	
 	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
 	//pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, (x_cord+measuredx_dot*(t_curr-t_measuredx))/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
-	pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};
+	pid_params x = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_x_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
 
+	x.set_pt = x_pos[pos_current];
 
 	wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T/2); //Wait until Delta_T/2
 
@@ -47,29 +36,30 @@ void stable_mode()
 	t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
 	// Initialise  PID parameters for the y-axis
 	//pid_params y = {KC, TAU_I, TAU_D, TAU_F, 0, 0, (y_cord+measuredy_dot*(t_curr-t_measuredy))/1000, 0, 0, 0, 0, 0}; //initialise PID paramaters for y axis
-	pid_params y = {KC, TAU_I, TAU_D, TAU_F, 0, 0, y_cord/1000, 0, 0, 0, 0, 0};
+	pid_params y = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, y_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
 
+	y.set_pt = y_pos[pos_current];
 
 	while(!next_mode)
 	{
-		if (one_button_pressed)
-		{
-			x.set_pt = 0;
-			y.set_pt = 0;
-			one_button_pressed = 0;
-		}
-
-		if (two_button_pressed)
+		gettimeofday(&tim, NULL);
+		t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
+		
+		if (x.error < 0) x.error *= -1;
+		if (y.error < 0) y.error *= -1;
+		
+		if (x.error < 0.005 && y.error < 0.005)	
 		{
 			x.set_pt = x_pos[pos_current];
 			y.set_pt = y_pos[pos_current];
 			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
 			pos_current++;
-			pos_current = pos_current%4;
-			two_button_pressed = 0;
+			pos_current = pos_current%40;
 		}
+		
+		
 
 
 
@@ -85,7 +75,7 @@ void stable_mode()
 
 		//Calculate new derivative term
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
-		//Caluclate new control signal
+		//Calculate new control signal
 		x.u_act = x.u_act_past + x.kc*(-x.pos_curr + x.pos_past) + ((x.kc * deltaT_x/1000)/x.tauI)*(x.error) - x.u_D + x.u_D_past;
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
@@ -109,7 +99,7 @@ void stable_mode()
 
 		//Calculate new derivative term
 		y.u_D = (y.tauF/(y.tauF+deltaT_y/1000))*y.u_D_past + ((y.kc*y.tauD)/(y.tauF+deltaT_y/1000))*(y.pos_curr - y.pos_past);
-		//Caluclate new control signal
+		//Calculate new control signal
 		y.u_act = y.u_act_past + y.kc*(-y.pos_curr + y.pos_past) + ((y.kc * deltaT_y/1000)/y.tauI)*(y.error) - y.u_D + y.u_D_past;
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
@@ -125,25 +115,4 @@ void stable_mode()
 
 	close_maestro(fd);
 	return;
-}
-
-
-
-void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double *new_delta, double required_delta)
-{
-		gettimeofday(tim, NULL);
-		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
-		(*new_delta) = (*t_curr-*t_past)*1000;
-
-
-		// nanosleep for slightly less than time needed
-		struct timespec req = {0};
-		req.tv_sec = 0;
-		req.tv_nsec = (required_delta - *new_delta) * 1000000L;
-		nanosleep(&req, (struct timespec *)NULL);
-
-
-		gettimeofday(tim, NULL);
-		(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
-		(*new_delta) = (*t_curr-*t_past)*1000;
 }

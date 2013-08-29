@@ -24,15 +24,37 @@ void * touchscreen_process()
 	struct input_event ev;
 	int fd, i;
 	fd=open("/dev/input/eGalax",O_RDONLY);
-	double time_past = 0;
-	double time_curr = 0;
+
+	double t_measuredx_past = 0;
+	double t_measuredy_past = 0;
+	double x_cord_past = 0;
+	double y_cord_past = 0;
+	
+	struct timeval tim;
 
 
 	while(1)
 	{
 			read(fd, &ev, sizeof(struct input_event));
-			if (ev.type == EV_ABS && ev.code==ABS_X) x_cord =((double)ev.value-2018)/11.427;
- 			if (ev.type == EV_ABS && ev.code==ABS_Y)y_cord = ((double)-ev.value+2046)/14.694;
+			if (ev.type == EV_ABS && ev.code==ABS_X)
+			{
+				x_cord_past = x_cord;
+				x_cord =((double)ev.value-2018)/11.427;
+				t_measuredx_past = t_measuredx;
+				gettimeofday(&tim, NULL);
+				t_measuredx=ev.time.tv_sec+(ev.time.tv_usec/1000000.0);
+				measuredx_dot = (x_cord/1000 - x_cord_past/1000)/(t_measuredx - t_measuredx_past);
+				
+			}
+ 			if (ev.type == EV_ABS && ev.code==ABS_Y)
+			{
+				y_cord_past = y_cord;
+				y_cord = ((double)-ev.value+2070)/14.694;  //2046
+				t_measuredy_past = t_measuredy;
+				gettimeofday(&tim, NULL);
+				t_measuredy=ev.time.tv_sec+(ev.time.tv_usec/1000000.0);		
+				measuredy_dot = (y_cord/1000 - y_cord_past/1000)/(t_measuredy - t_measuredy_past);
+			}
 			if (ev.type == EV_KEY && ev.code==BTN_TOUCH) touchscreen_touched = ev.value;
 	}
 

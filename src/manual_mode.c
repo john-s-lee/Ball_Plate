@@ -72,6 +72,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		if (left_button_pressed && man_mode_select == 1)
 		{
 			x.set_pt -= 0.005;
+			printf("x= %f\n", x.set_pt);
 			if (x.set_pt > 0.15) x.set_pt = 0.15;
 			if (x.set_pt < -0.15) x.set_pt = -0.15;
 			left_button_pressed = 0;
@@ -80,6 +81,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		if (right_button_pressed && man_mode_select == 1)
 		{
 			x.set_pt += 0.005;
+			printf("x= %f\n", x.set_pt);
 			if (x.set_pt > 0.15) x.set_pt = 0.15;
 			if (x.set_pt < -0.15) x.set_pt = -0.15;
 			right_button_pressed = 0;
@@ -88,6 +90,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		if (up_button_pressed && man_mode_select == 1)
 		{
 			y.set_pt += 0.005;
+			printf("y= %f\n", y.set_pt);
 			if (y.set_pt > 0.12) x.set_pt = 0.12;
 			if (y.set_pt < -0.12) x.set_pt = -0.12;
 			up_button_pressed = 0;
@@ -96,6 +99,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 		if (down_button_pressed && man_mode_select == 1)
 		{
 			y.set_pt -= 0.005;
+			printf("y= %f\n", y.set_pt);
 			if (y.set_pt > 0.12) x.set_pt = 0.12;
 			if (y.set_pt < -0.12) x.set_pt = -0.12;
 			down_button_pressed = 0;

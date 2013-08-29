@@ -76,3 +76,20 @@ void close_maestro(int fd)
 {
 	close(fd);
 }
+
+void maestroSetSpeed(int fd, int speed)
+{
+	//Set Speed limits for the servo as MAESTRO_SPEED defined in micro_maestro.h
+	unsigned char command[] = {0x87, 0, speed & 0x7F, speed >> 7 & 0x7F};
+	if (write(fd, command, sizeof(command)) == -1)
+	{
+		perror("error writing");
+		return;
+	}
+	unsigned char command2[] = {0x87, 1, speed & 0x7F, speed >> 7 & 0x7F};
+	if (write(fd, command2, sizeof(command)) == -1)
+	{
+		perror("error writing");
+		return;
+	}
+}

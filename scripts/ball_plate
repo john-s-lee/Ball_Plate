@@ -2,7 +2,7 @@
 
 ## Fill in name of program here.
 PROG="ball_plate"
-PROG_PATH="/usr/bin" ## Not need, but sometimes helpful (if $PROG resides in /opt for example).
+PROG_PATH="/usr/bin/" ## Not need, but sometimes helpful (if $PROG resides in /opt for example).
 PROG_ARGS="" 
 PID_PATH="/var/run/"
 

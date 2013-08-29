@@ -75,7 +75,6 @@ void stable_mode()
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
-			printf("tcurr = %f\n", t_x_curr - t_start);
 
 		x.pos_past = x.pos_curr;  //store past ball position
 		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000;  //Get balls position from 2nd order estimator

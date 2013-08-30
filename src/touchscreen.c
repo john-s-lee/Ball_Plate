@@ -29,6 +29,8 @@ void * touchscreen_process()
 	double t_measuredy_past = 0;
 	double x_cord_past = 0;
 	double y_cord_past = 0;
+	double x_dot_past = 0;
+	double y_dot_past = 0;
 	
 	struct timeval tim;
 
@@ -38,12 +40,14 @@ void * touchscreen_process()
 			read(fd, &ev, sizeof(struct input_event));
 			if (ev.type == EV_ABS && ev.code==ABS_X)
 			{
+				x_dot_past = measuredx_dot;
 				x_cord_past = x_cord;
 				x_cord =((double)ev.value-2018)/11.427;
 				t_measuredx_past = t_measuredx;
 				gettimeofday(&tim, NULL);
 				t_measuredx=ev.time.tv_sec+(ev.time.tv_usec/1000000.0);
 				measuredx_dot = (x_cord/1000 - x_cord_past/1000)/(t_measuredx - t_measuredx_past);
+				measuredx_dot_dot = (measuredx_dot - x_dot_past)/(t_measuredx - t_measuredx_past);
 				
 			}
  			if (ev.type == EV_ABS && ev.code==ABS_Y)

@@ -41,7 +41,7 @@
 extern int next_mode, mode, two_button_pressed, touchscreen_touched, one_button_pressed;
 extern unsigned char rpt_mode, up_button_pressed, down_button_pressed, left_button_pressed, right_button_pressed;
 extern double x_cord, y_cord, t_measuredx, t_measuredy, measuredx_dot, measuredy_dot;
-
+extern double measuredx_dot_dot, measuredy_dot_dot;
 
 int set_bit(int number, int bit);
 int toggle_bit(int number, int bit);

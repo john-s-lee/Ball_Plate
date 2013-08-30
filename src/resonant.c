@@ -31,7 +31,6 @@ void circle_mode()
 	t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
 
 	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
-	//pid_params x = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, (x_cord+measuredx_dot*(t_curr-t_measuredx))/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
 	pid_params x = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_x_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_x_past with current time (in seconds)
@@ -41,7 +40,6 @@ void circle_mode()
 	wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T/2); //Wait until Delta_T/2
 
 	// Initialise  PID parameters for the y-axis
-	//pid_params y = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, (y_cord+measuredy_dot*(t_x_curr-t_measuredy))/1000, 0, 0, 0, 0, 0}; //initialise PID paramaters for y axis
 	pid_params y = {KC_CIRCLE, TAU_I_CIRCLE, TAU_D_CIRCLE, TAU_F_CIRCLE, 0, 0, y_cord/1000, 0, 0, 0, 0, 0};
 	gettimeofday(&tim, NULL);
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
@@ -89,8 +87,8 @@ void circle_mode()
 		x.set_pt = x_amplitude*sin(mode_circles*w0*t_curr + x_offset);
 	
 		x.pos_past = x.pos_curr;  //store past ball position
-		x.pos_curr = (x_cord+measuredx_dot*(t_x_curr-t_measuredx))/1000;  //current ball position is equal to the coordinates read from the touchscreen
-		//x.pos_curr = x_cord/1000;
+		//x.pos_curr = (x_cord+measuredx_dot*(t_x_curr-t_measuredx))/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000; 
 		x.u_D_past = x.u_D;  //store past derivative control signal
 		x.u_act_past = x.u_act;  //store past control signal
 		x.error = (x.set_pt - x.pos_curr); //calculate error r(t) - y(t)
@@ -114,7 +112,8 @@ void circle_mode()
 		y.set_pt = y_amplitude*sin(w0*t_curr + y_offset);
 
 		y.pos_past = y.pos_curr;  //store past ball position
-		y.pos_curr = (y_cord+measuredy_dot*(t_y_curr-t_measuredy))/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		//y.pos_curr = (y_cord+measuredy_dot*(t_y_curr-t_measuredy))/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		y.pos_curr=(y_cord+measuredy_dot*(t_y_curr-t_measuredy)+0.5*measuredy_dot_dot*pow((t_y_curr-t_measuredy),2.0))/1000;
 		//y.pos_curr = y_cord/1000;
 		y.u_D_past = y.u_D;  //store past derivative control signal
 		y.u_act_past = y.u_act;

@@ -26,6 +26,8 @@ double t_measuredy = 0;
 double t_measuredx = 0;
 double measuredx_dot = 0;
 double measuredy_dot = 0;
+double measuredx_dot_dot = 0;
+double measuredy_dot_dot = 0;
 
 //**************   Main Function   **************/
 int main(int argc, char * argv[])

@@ -76,7 +76,7 @@ void stable_mode()
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
 		x.pos_past = x.pos_curr;  //store past ball position
-		x.pos_curr = (x_cord+measuredx_dot*(t_x_curr-t_measuredx))/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000;  //Get balls position from 2nd order estimator
 		//x.pos_curr = x_cord/1000;
 		x.u_D_past = x.u_D;  //store past derivative control signal
 		x.u_act_past = x.u_act;  //store past control signal
@@ -100,8 +100,8 @@ void stable_mode()
 		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
 
 		y.pos_past = y.pos_curr;  //store past ball position
-		y.pos_curr = (y_cord+measuredy_dot*(t_y_curr-t_measuredy))/1000;  //current ball position is equal to the coordinates read from the touchscreen
-		//y.pos_curr = y_cord/1000;
+		//y.pos_curr = (y_cord+measuredy_dot*(t_y_curr-t_measuredy))/1000;  //current ball position is equal to the coordinates read from the touchscreen
+		y.pos_curr=(y_cord+measuredy_dot*(t_y_curr-t_measuredy)+0.5*measuredy_dot_dot*pow((t_y_curr-t_measuredy),2.0))/1000;
 		y.u_D_past = y.u_D;  //store past derivative control signal
 		y.u_act_past = y.u_act;
 		y.error = (y.set_pt - y.pos_curr);

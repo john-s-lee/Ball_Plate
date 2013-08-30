@@ -75,6 +75,7 @@ void stable_mode()
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 	
+		printf("DeltaT = %f\n", deltaT_x);
 		x.pos_past = x.pos_curr;  //store past ball position
 		x.pos_curr=(x_cord+measuredx_dot*(t_x_curr-t_measuredx)+0.5*measuredx_dot_dot*pow((t_x_curr-t_measuredx),2.0))/1000;  //Get balls position from 2nd order estimator
 		//x.pos_curr = x_cord/1000;
@@ -136,14 +137,14 @@ void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double
 		(*new_delta) = (*t_curr-*t_past)*1000;
 
 
-		// nanosleep for slightly less than time needed
-		struct timespec req = {0};
-		req.tv_sec = 0;
-		req.tv_nsec = (required_delta - *new_delta) * 1000000L;
-		nanosleep(&req, (struct timespec *)NULL);
-
-
 		gettimeofday(tim, NULL);
-		(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
+		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
+
+		while(*new_delta < (required_delta-0.02)) //Wait till Delta_T/2 is reached
+		{
+			gettimeofday(tim, NULL);
+			(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
+			(*new_delta) = (*t_curr-*t_past)*1000;
+		}
 }

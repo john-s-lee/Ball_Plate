@@ -121,6 +121,7 @@ int main(int argc, char * argv[])
 			maze_mode();
 			printf("Leaving Square Mode\n\n");
 			next_mode =0;
+			return 0;
 		}
 		
 		

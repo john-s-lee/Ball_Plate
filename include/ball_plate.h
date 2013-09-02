@@ -34,10 +34,10 @@
 #define TAU_I_CIRCLE 1.2484
 #define TAU_D_CIRCLE 0.5016
 #define TAU_F_CIRCLE 0.1172
-#define PHASE_DIFF_2_5 -2.9
-#define GAIN_2_5 4
+#define PHASE_DIFF_2_5 -1.6
+#define GAIN_2_5 1.1115
 #define PHASE_DIFF_Y  -2.7
-#define GAIN_Y  4.1
+#define GAIN_Y  2.2
 
 
 

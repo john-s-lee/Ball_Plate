@@ -21,7 +21,7 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 	double t_x_curr, t_x_past, t_y_curr, t_y_past;
 	struct timeval tim;
 
-	char man_mode_select = 0;
+	char man_mode_select = 1;
 
 	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
 	pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, x_cord/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
@@ -36,6 +36,15 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 	gettimeofday(&tim, NULL);
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
 
+	FILE * fp_xpos;
+	fp_xpos = fopen("x_pos.txt","w");
+	fprintf(fp_xpos, "x_pos = ");
+	fflush(fp_xpos);
+	
+	FILE * fp_ypos;
+	fp_ypos = fopen("y_pos.txt", "w");
+	fprintf(fp_ypos, "y_pos = ");
+	fflush(fp_ypos);
 
 	while(!next_mode)
 	{
@@ -60,13 +69,20 @@ void manual_mode(cwiid_wiimote_t *wiimote)
 
 		if (two_button_pressed)
 		{
-			if (man_mode_select ==0){
-				man_mode_select = 1;  //mode 0 is accelerometer mode 1 is keypad
-					playsound("/usr/share/sounds/ball_plate/key_input.wav");}
-			else{
-			man_mode_select = 0;
-				playsound("/usr/share/sounds/ball_plate/acc_input.wav");}
+			// if (man_mode_select ==0){
+				// man_mode_select = 1;  //mode 0 is accelerometer mode 1 is keypad
+					// playsound("/usr/share/sounds/ball_plate/key_input.wav");}
+			// else{
+			// man_mode_select = 0;
+				// playsound("/usr/share/sounds/ball_plate/acc_input.wav");}
+			// two_button_pressed = 0;
+			fprintf(fp_xpos, "%f,  ", x.set_pt);
+			fprintf(fp_ypos, "%f,  ", y.set_pt);
+			fflush(fp_xpos);
+			fflush(fp_ypos);
+			printf("Saving Position!\n");
 			two_button_pressed = 0;
+
 		}
 
 		if (left_button_pressed && man_mode_select == 1)

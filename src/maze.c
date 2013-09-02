@@ -10,17 +10,38 @@ void maze_mode()
 	int fd = init_maestro();
 	int target; //Micro Maestro target value
 	double deltaT_x, deltaT_y;
-	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr;
+	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr, t_start;
 	struct timeval tim;
 	double r_act = 0;
-	float x_pos[] = {0.11, 0.11, 0.14, 0.14, 0.08, 0.08, 0.02, 0.02, -0.03, -0.03, -0.09,  -0.09, -0.145, -0.145, -0.105,  -0.105, -0.145,  -0.145,   -0.105,  -0.105, -0.145, -0.145,  -0.11,  -0.11,  -0.06,  -0.06,  -0.01,  -0.01,  -0.035, -0.035, 0.07, 0.07,  0.11, 0.11,  0.14,  0.14, 0.105, 0.105,  0.145, 	 0.145};
-	float y_pos[] = {-0.015, -0.055, -0.055, -0.115, -0.115, -0.095,  -0.095, -0.115, -0.115, -0.095, -0.095,  -0.115, -0.115, -0.1, -0.1, -0.12, -0.12, -0.07, -0.07, -0.04, -0.04,  0.005, 0.005,  0.05,  0.05, 0.11,  0.11,  0.095, 0.095, 0.11, 0.11,  0.095,  0.095,  0.115, 0.115, 0.065,  0.065,  0.035,  0.035,  -0.01};  
+	float y_pos[] = {-0.095000,  -0.120000,  -0.120000,  -0.095000,  -0.095000,  -0.110000,  -0.115000,  -0.065000,  -0.065000,  -0.030000,  -0.030000,  0.015000,  0.010000,  0.045000,  0.045000,  0.115000,  0.115000,  0.100000,  0.100000,  0.120000,  0.120000,  0.100000,  0.100000,  0.120000,  0.120000,  0.095000,  0.095000,  0.120000,  0.120000,  0.065000,  0.065000,  0.030000,  0.030000,  -0.015000,  -0.015000,  -0.050000,  -0.050000,  -0.115000,  -0.115000,  -0.100000,  -0.100000,  -0.110000,  -0.115000} ;
+	float x_pos[] = {0.020000,  0.020000,  -0.035000,  -0.035000,  -0.090000,  -0.090000,  -0.150000,  -0.145000,  -0.105000,  -0.105000,  -0.145000,  -0.145000,  -0.105000,  -0.105000,  -0.145000,  -0.145000,  -0.110000,  -0.110000,  -0.060000,  -0.060000,  -0.015000,  -0.015000,  0.035000,  0.035000,  0.070000,  0.070000,  0.105000,  0.115000,  0.140000,  0.140000,  0.105000,  0.105000,  0.140000,  0.140000,  0.105000,  0.105000,  0.135000,  0.135000,  0.075000,  0.075000,  0.025000,  0.025000,  -0.030000} ;
 	int pos_current = 0;
 
 
 
 	gettimeofday(&tim, NULL);
 	t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
+	t_start = t_curr;
+	
+	FILE *fp_timex;
+	fp_timex = fopen("timex.txt", "w");
+	fprintf(fp_timex, "time_x\n");
+	FILE *fp_timey;
+	fp_timey = fopen("timey.txt", "w");
+	fprintf(fp_timey, "time_y\n");
+	FILE *fp_x_pos;
+	fp_x_pos = fopen("x_pos.txt", "w");
+	fprintf(fp_x_pos, "x\n");
+	FILE *fp_y_pos;
+	fp_y_pos = fopen("y_pos.txt", "w");
+	fprintf(fp_y_pos, "y\n");
+	FILE *fp_u_x;
+	fp_u_x = fopen("u_x.txt", "w");
+	fprintf(fp_u_x, "x_star\n");
+	FILE *fp_u_y;
+	fp_u_y = fopen("u_y.txt", "w");
+	fprintf(fp_u_y, "y_star\n");
+	
 	
 	//Initialise PID parameters for the x-axis and the wait or DELTA_T/2
 	//pid_params x = {KC, TAU_I, TAU_D, TAU_F, 0, 0, (x_cord+measuredx_dot*(t_curr-t_measuredx))/1000, 0, 0, 0, 0, 0};  //initialise PID parameters for x axis
@@ -80,7 +101,10 @@ void maze_mode()
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 		
-
+		fprintf(fp_timex, "%f\n", t_x_curr-t_start);
+		fprintf(fp_x_pos, "%f\n", x.pos_curr);
+		fprintf(fp_u_x, "%f\n", x.set_pt);
+		
 		//Output Control Signal
 		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
 		maestroSetTarget(fd, 0, target);
@@ -104,7 +128,10 @@ void maze_mode()
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 		
-
+		fprintf(fp_timey, "%f\n", t_y_curr-t_start);
+		fprintf(fp_y_pos, "%F\n", y.pos_curr);
+		fprintf(fp_u_y, "%f\n", y.set_pt);
+		
 		//Output control signal
 		target=(int)(y.u_act*(2.4*180/PI)*40+(4*Y_SERVO_CENTRE));
 		maestroSetTarget(fd, 1, target);

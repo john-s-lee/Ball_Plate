@@ -68,6 +68,7 @@ void circle_mode()
 
 	int i=0;
 
+	two_button_pressed = 1;
 	//while(!next_mode)
 	while (i < 30000)
 	{
@@ -108,7 +109,7 @@ void circle_mode()
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis
 		t_curr = t_x_curr-t_start;
-		x.set_pt = x_amplitude*sin(mode_circles*w0*t_curr + x_offset);
+		x.set_pt = GAIN_2_5*0.12*sin(w0*t_curr/2 - PHASE_DIFF_2_5);
 	
 		x.pos_past = x.pos_curr;  //store past ball position
 		//x.pos_curr = (x_cord+measuredx_dot*(t_x_curr-t_measuredx))/1000;  //current ball position is equal to the coordinates read from the touchscreen
@@ -126,7 +127,7 @@ void circle_mode()
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 
-		set_pt_star = 0.075*sin(w0*t_curr + PI/2);
+		set_pt_star = 0.12*sin(w0*t_curr/2);
 
 		fprintf(fp_timex, "%f\n", t_x_curr-t_start);
 		fprintf(fp_x_pos, "%f\n", x.pos_curr);
@@ -139,7 +140,7 @@ void circle_mode()
 
 		wait_for_deltat(&tim, &t_y_curr, &t_y_past, &deltaT_y, DELTA_T); //Get Accurate timings
 		t_curr = t_y_curr-t_start;
-		y.set_pt = y_amplitude*sin(w0*t_curr + y_offset);
+		y.set_pt = GAIN_Y*0.075*sin(w0*t_curr - PHASE_DIFF_Y);
 
 		y.pos_past = y.pos_curr;  //store past ball position
 		//y.pos_curr = (y_cord+measuredy_dot*(t_y_curr-t_measuredy))/1000;  //current ball position is equal to the coordinates read from the touchscreen

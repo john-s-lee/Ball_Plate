@@ -52,6 +52,9 @@ void stable_mode()
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
 	double t_start = t_y_past;
 
+	int pid_mode = 0;
+	int new_cycles = 0;
+
 	while(!next_mode)
 	{
 		if (one_button_pressed)
@@ -59,18 +62,28 @@ void stable_mode()
 			x.set_pt = 0;
 			y.set_pt = 0;
 			one_button_pressed = 0;
+			pid_mode = 0;
 		}
 
 		if (two_button_pressed)
 		{
-			x.set_pt = x_pos[pos_current];
-			y.set_pt = y_pos[pos_current];
-			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
-			pos_current++;
-			pos_current = pos_current%4;
+			pid_mode = 1;
+			new_cycles = 0;
 			two_button_pressed = 0;
 		}
 
+		if (pid_mode == 1)
+		{
+			new_cycles ++;
+			if (new_cycles % 250 == 0)
+			{
+				x.set_pt = x_pos[pos_current];
+				y.set_pt = y_pos[pos_current];
+				printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
+				pos_current++;
+				pos_current = pos_current%4;
+			}
+		}
 
 
 		wait_for_deltat(&tim, &t_x_curr, &t_x_past, &deltaT_x, DELTA_T); //Wait until DELTA_T for x-axis

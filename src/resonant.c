@@ -17,7 +17,7 @@ void circle_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_start, t_curr;
 	struct timeval tim;
 	float mode_circles = 1;
-	double x_amplitude = 0.14;
+	double x_amplitude = 0.13;
 	double y_amplitude = 0.14;
 
 	double x_offset = PI/2;

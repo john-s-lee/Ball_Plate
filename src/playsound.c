@@ -30,10 +30,13 @@ void stopsound()
 
 void * function1(void * argument)
 {
-	char *song = (char*)argument;
-	char command[100];
-	sprintf(command, "aplay %s", song);
-	system(command);
+	if (mute%2 == 0)
+	{
+		char *song = (char*)argument;
+		char command[100];
+		sprintf(command, "aplay %s", song);
+		system(command);
+	}
 	return 0;
 }
 

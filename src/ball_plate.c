@@ -14,6 +14,7 @@
 //**************  Global Variables **************/
 cwiid_mesg_callback_t cwiid_callback;
 cwiid_err_t err;
+int mute = 0;
 int next_mode, mode;
 int two_button_pressed = 0;
 int one_button_pressed = 0;

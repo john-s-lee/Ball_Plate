@@ -46,7 +46,8 @@ void maze_mode()
 	{
 		gettimeofday(&tim, NULL);
 		t_curr=tim.tv_sec+(tim.tv_usec/1000000.0);
-		
+                x.error = (x.set_pt - x.pos_curr);
+                y.error = (y.set_pt - y.pos_curr);		
 		if (x.error < 0) x.error *= -1;
 		if (y.error < 0) y.error *= -1;
 		
@@ -59,7 +60,7 @@ void maze_mode()
 			pos_current = pos_current%40;
 		}
 		
-		
+		              
 
 
 
@@ -71,6 +72,21 @@ void maze_mode()
 		x.u_act_past = x.u_act;  //store past control signal
 		x.error = (x.set_pt - x.pos_curr); //calculate error r(t) - y(t)
 		t_x_past = t_x_curr;  //Save new time
+
+		if (x.error > 0.01 || x.error < -0.01)
+		{
+			x.tauF = TAUF_FAST;
+			x.kc = KC_FAST;
+			x.tauD = TAUD_FAST;
+			x.tauI = TAUI_FAST;
+		}
+		else
+		{
+			x.tauF = TAU_F;
+                        x.kc = KC;
+                        x.tauD = TAU_D;
+                        x.tauI = TAU_I;
+		}
 
 		//Calculate new derivative term
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
@@ -95,6 +111,22 @@ void maze_mode()
 		y.u_act_past = y.u_act;
 		y.error = (y.set_pt - y.pos_curr);
 		t_y_past = t_y_curr;  //Save new time
+
+
+                if (y.error > 0.01 || y.error < -0.01)
+                {
+                        y.tauF = TAUF_FAST;
+                        y.kc = KC_FAST;
+                        y.tauD = TAUD_FAST;
+                        y.tauI = TAUI_FAST;
+                }
+                else
+                {
+                        y.tauF = TAU_F;
+                        y.kc = KC;
+                        y.tauD = TAU_D;
+                        y.tauI = TAU_I;
+                }
 
 		//Calculate new derivative term
 		y.u_D = (y.tauF/(y.tauF+deltaT_y/1000))*y.u_D_past + ((y.kc*y.tauD)/(y.tauF+deltaT_y/1000))*(y.pos_curr - y.pos_past);

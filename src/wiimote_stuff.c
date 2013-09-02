@@ -1,6 +1,6 @@
 #include "../include/ball_plate.h"
 #include "../include/wiimote_stuff.h"
-
+#include "../include/playsound.h"
 
 //**************  Wiimote Callback Function   ************************/
 void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
@@ -62,6 +62,11 @@ void cwiid_callback(cwiid_wiimote_t *wiimote, int mesg_count,
 			{
 					//printf("1 Button Pressed!!\n");
 					one_button_pressed = 1;
+			}
+			if (mesg[i].btn_mesg.buttons & CWIID_BTN_A)
+			{
+				mute++;
+				if (mute%2 ==1) stopsound();
 			}
 
 		}

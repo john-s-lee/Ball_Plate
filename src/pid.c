@@ -16,9 +16,10 @@ void stable_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_curr;
 	struct timeval tim;
 	double r_act = 0;
-	float x_pos[] = {-0.075, 0.075, 0.075, -0.075};
-	float y_pos[] = {0.075, 0.075, -0.075, -0.075};
+	float x_pos[] = {-0.07, 0.07, 0.07, -0.07};
+	float y_pos[] = {0.07, 0.07, -0.07, -0.07};
 	int pos_current = 0;
+	double du_x, du_x_past, du_y, du_y_past, ddu_x, ddu_y;
 
 	maestroSetSpeed(fd, 20);
 	maestroSetTarget(fd, 1, 4*Y_SERVO_CENTRE);
@@ -102,6 +103,22 @@ void stable_mode()
 		x.error = (x.set_pt - x.pos_curr); //calculate error r(t) - y(t)
 		t_x_past = t_x_curr;  //Save new time
 
+		if (x.error > 0.02 || x.error < -0.05)
+                {
+                        x.tauF = TAUF_FAST;
+                        x.kc = KC_FAST;
+                        x.tauD = TAUD_FAST;
+                        x.tauI = TAUI_FAST;
+                }
+                else
+                {
+                        x.tauF = TAU_F;
+                        x.kc = KC;
+                        x.tauD = TAU_D;
+                        x.tauI = TAU_I;
+                }
+
+
 		//Calculate new derivative term
 		x.u_D = (x.tauF/(x.tauF+deltaT_x/1000))*x.u_D_past + ((x.kc*x.tauD)/(x.tauF+deltaT_x/1000))*(x.pos_curr - x.pos_past);
 		//Caluclate new control signal
@@ -110,7 +127,39 @@ void stable_mode()
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
+
+
+		du_x_past = du_x;
+		du_x = (x.u_act - x.u_act_past)/deltaT_x;  //Calculate derivative of control signal
+
+		if (du_x < DUMIN)
+		{
+			du_x = DUMIN;
+			x.u_act = x.u_act_past + DUMIN*deltaT_x;
+		}
+
 		
+		if (du_x > DUMAX)
+		{
+                        du_x = DUMAX;
+                        x.u_act = x.u_act_past + DUMAX*deltaT_x;
+                }
+
+
+		ddu_x = (du_x - du_x_past)/deltaT_x;  //Calculate double derivative of control signal
+
+		if (ddu_x < DDUMIN)
+		{
+			du_x = du_x_past + DDUMIN*deltaT_x;
+			x.u_act = x.u_act_past + du_x*deltaT_x;
+		}
+
+                if (ddu_x  > DDUMAX)
+                {
+                        du_x = du_x_past + DDUMAX*deltaT_x;
+                        x.u_act = x.u_act_past + du_x*deltaT_x;
+                } 
+    		
 
 		//Output Control Signal
 		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
@@ -127,6 +176,21 @@ void stable_mode()
 		y.error = (y.set_pt - y.pos_curr);
 		t_y_past = t_y_curr;  //Save new time
 
+                if (y.error > 0.02 || y.error < -0.05)
+                {
+                        y.tauF = TAUF_FAST;
+                        y.kc = KC_FAST;
+                        y.tauD = TAUD_FAST;
+                        y.tauI = TAUI_FAST;
+                }
+                else
+                {
+                        y.tauF = TAU_F;
+                        y.kc = KC;
+                        y.tauD = TAU_D;
+                        y.tauI = TAU_I;
+                }
+
 		//Calculate new derivative term
 		y.u_D = (y.tauF/(y.tauF+deltaT_y/1000))*y.u_D_past + ((y.kc*y.tauD)/(y.tauF+deltaT_y/1000))*(y.pos_curr - y.pos_past);
 		//Caluclate new control signal
@@ -134,6 +198,37 @@ void stable_mode()
 
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
+
+                du_y_past = du_y;
+                du_y = (y.u_act - y.u_act_past)/deltaT_y;  //Calculate derivative of control signal
+
+                if (du_y < DUMIN)
+                {
+                        du_y = DUMIN;
+                        y.u_act = y.u_act_past + DUMIN*deltaT_y;
+                }
+
+
+                if (du_y > DUMAX)
+                {
+                        du_y = DUMAX;
+                        y.u_act = y.u_act_past + DUMAX*deltaT_y;
+                }
+
+
+                ddu_y = (du_y - du_y_past)/deltaT_y;  //Calculate double derivative of control signal
+
+                if (ddu_y < DDUMIN)
+                {
+                        du_y = du_y_past + DDUMIN*deltaT_y;
+                        y.u_act = y.u_act_past + du_y*deltaT_y;
+                }
+
+                if (ddu_y  > DDUMAX)
+                {
+                        du_y = du_y_past + DDUMAX*deltaT_y;
+                        y.u_act = y.u_act_past + du_y*deltaT_y;
+                }
 		
 
 		//Output control signal

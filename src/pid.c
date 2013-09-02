@@ -70,6 +70,12 @@ void stable_mode()
 			pid_mode = 1;
 			new_cycles = 0;
 			two_button_pressed = 0;
+			x.set_pt = x_pos[pos_current];
+			y.set_pt = y_pos[pos_current];
+			printf("x_pos = %f, y_pos = %f\n", x.set_pt, y.set_pt);
+			pos_current++;
+			pos_current = pos_current%4;
+
 		}
 
 		if (pid_mode == 1)

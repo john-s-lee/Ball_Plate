@@ -180,15 +180,23 @@ void wait_for_deltat(struct timeval *tim, double *t_curr, double *t_past, double
 		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
 
+		struct timespec t_curr_spec, t_delta_spec;
+		clock_gettime(CLOCK_MONOTONIC, &t_curr_spec);
+		//printf("current ns= %ld\n", t_curr_spec.tv_nsec);
+
+		long int new_delta_long = required_delta*1000000-*new_delta*1000000;
+
+		long int new_delta_long_secs = t_curr_spec.tv_sec + ((double)t_curr_spec.tv_nsec/1000000000 + (double)new_delta_long/1000000000);
+		new_delta_long = (t_curr_spec.tv_nsec+new_delta_long)%1000000000;
+
+		t_delta_spec.tv_sec =new_delta_long_secs;
+		t_delta_spec.tv_nsec = new_delta_long;
+
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t_delta_spec, NULL);
+
 
 		gettimeofday(tim, NULL);
-		(*t_curr)=(tim->tv_sec)+(tim->tv_usec/1000000.0); 
+		(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
 		(*new_delta) = (*t_curr-*t_past)*1000;
 
-		while(*new_delta < (required_delta-0.02)) //Wait till Delta_T/2 is reached
-		{
-			gettimeofday(tim, NULL);
-			(*t_curr)=tim->tv_sec+(tim->tv_usec/1000000.0); 
-			(*new_delta) = (*t_curr-*t_past)*1000;
-		}
 }

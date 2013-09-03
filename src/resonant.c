@@ -17,11 +17,13 @@ void circle_mode()
 	double t_x_curr, t_x_past, t_y_curr, t_y_past, t_start, t_curr;
 	struct timeval tim;
 	float mode_circles = 1;
-	double x_amplitude = 0.14;
-	double y_amplitude = 0.14;
+	double x_amplitude = 0.075*GAIN_2_5/2;
+	double y_amplitude = 0.075*GAIN_Y/2;
 
-	double x_offset = PI/2;
-	double y_offset = 0;
+	double set_pt_star = 0;
+
+	double x_offset = PI/2-PHASE_DIFF_2_5;
+	double y_offset = -PHASE_DIFF_Y;
 
 	one_button_pressed = 0;
 	two_button_pressed = 0;
@@ -45,7 +47,29 @@ void circle_mode()
 	t_y_past=tim.tv_sec+(tim.tv_usec/1000000.0); //initialise t_y_past with current time (in seconds)
 	t_start = t_y_past;
 
-	while(!next_mode)
+	FILE *fp_timex;
+	fp_timex = fopen("timex.txt", "w");
+	fprintf(fp_timex, "time_x\n");
+	FILE *fp_timey;
+	fp_timey = fopen("timey.txt", "w");
+	fprintf(fp_timey, "time_y\n");
+	FILE *fp_x_pos;
+	fp_x_pos = fopen("x_pos.txt", "w");
+	fprintf(fp_x_pos, "x\n");
+	FILE *fp_y_pos;
+	fp_y_pos = fopen("y_pos.txt", "w");
+	fprintf(fp_y_pos, "y\n");
+	FILE *fp_u_x;
+	fp_u_x = fopen("u_x.txt", "w");
+	fprintf(fp_u_x, "x_star\n");
+	FILE *fp_u_y;
+	fp_u_y = fopen("u_y.txt", "w");
+	fprintf(fp_u_y, "y_star\n");
+
+	int i=0;
+
+	//while(!next_mode)
+	while (i < 30000)
 	{
 		if (one_button_pressed)
 		{
@@ -102,6 +126,12 @@ void circle_mode()
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 
+		set_pt_star = 0.075*sin(w0*t_curr + PI/2);
+
+		fprintf(fp_timex, "%f\n", t_x_curr-t_start);
+		fprintf(fp_x_pos, "%f\n", x.pos_curr);
+		fprintf(fp_u_x, "%f\n", set_pt_star);
+
 		//Output Control Signal
 		target=(int)((x.u_act*(2.4*180/PI))*40+(4*X_SERVO_CENTRE));
 		maestroSetTarget(fd, 0, target);
@@ -128,13 +158,26 @@ void circle_mode()
 		if (x.u_act > UMAX) x.u_act = UMAX;
 		if (x.u_act < UMIN) x.u_act = UMIN;
 
+		set_pt_star = 0.075*sin(w0*t_curr);
+
+		fprintf(fp_timey, "%f\n", t_y_curr-t_start);
+		fprintf(fp_y_pos, "%F\n", y.pos_curr);
+		fprintf(fp_u_y, "%f\n", set_pt_star);
+
 		//Output control signal
 		target=(int)(y.u_act*(2.4*180/PI)*40+(4*Y_SERVO_CENTRE));
 		maestroSetTarget(fd, 1, target);
 		//printf("Test Control Signal u_act_y = %f degrees\n", y.u_act*(180/PI));
 
+		i++;
 	}
-
+	
+	fclose(fp_timex);
+	fclose(fp_timey);
+	fclose(fp_x_pos);
+	fclose(fp_y_pos);
+	fclose(fp_u_x);
+	fclose(fp_u_y);
 	close_maestro(fd);
 	return;
 }

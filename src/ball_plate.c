@@ -32,7 +32,7 @@ double measuredy_dot_dot = 0;
 //**************   Main Function   **************/
 int main(int argc, char * argv[])
 {
-	mode = STABLE_MODE;
+	mode = CIRCLE_MODE;
 	next_mode = 0;
 	cwiid_wiimote_t *wiimote;	/* wiimote handle */
 	struct cwiid_state state;	/* wiimote state */
@@ -82,7 +82,6 @@ int main(int argc, char * argv[])
 			printf("Executing Ball Stabilization Mode\n");
 			stable_mode();
 			printf("Leaving Ball Stabilization Mode\n\n");
-			return 0;
 			next_mode = 0;
 		}
 
@@ -107,7 +106,7 @@ int main(int argc, char * argv[])
 			set_led_state(wiimote, led_state);
 			
 			circle_mode();		
-
+			return 0;
 			printf("Leaving Circle Mode\n\n");
 			next_mode = 0;
 		}

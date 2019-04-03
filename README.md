@@ -4,7 +4,7 @@
 **Student Number:** s3273319  
 
 ###Description##
-This is the ball and plate balancing system code.  This is to be compiled on the BeagleBoard XM and used with a bluetooth dongle (for wiimote access), Pololu Micro Maestro (for servo control) and the touch screen attached to the USB ports.  This code forms part of my final year project for the course Engineering Design 4 at RMIT.  A video of the completed project is available at http://youtu.be/wiPWqmlN5N4.
+This is the ball and plate balancing system code.  This is to be compiled on the BeagleBoard XM and used with a bluetooth dongle (for wiimote access), Pololu Micro Maestro (for servo control) and the touch screen attached to the USB ports.  This code forms part of my final year project for the course Engineering Design 4 at RMIT.  A video of the completed project is available at http://youtu.be/wiPWqmlN5N4. The submitted design report is uploaded above.
 
 ###Usage###
 Install Ball and Plate System Demonstrator code by running "sudo ./install_ball_plate" from the scripts directory. 
